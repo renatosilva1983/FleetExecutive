@@ -1,0 +1,50 @@
+<div class="toolbar">
+  <div class="period-pills">
+    <button class="pill active">6 meses</button>
+    <button class="pill">Ano</button>
+    <button class="pill">Personalizado</button>
+  </div>
+  <div class="toolbar-right">
+    <button class="btn-ghost">⌄ Exportar PDF</button>
+  </div>
+</div>
+
+<div class="stat-cards kpi-cards">
+  @for (k of kpis; track k.label) {
+    <div class="stat-card">
+      <div>
+        <div class="stat-val">{{ k.valor }}</div>
+        <div class="stat-lbl">{{ k.label }}</div>
+      </div>
+      <div class="kpi-trend" [style.color]="k.cor">{{ k.trend }}</div>
+    </div>
+  }
+</div>
+
+<div class="report-grid">
+  <div class="card">
+    <div class="card-title">Faturamento mensal</div>
+    <div class="bar-chart">
+      @for (m of faturamentoMensal; track m.mes) {
+        <div class="bar-col">
+          <div class="bar-value">{{ m.label }}</div>
+          <div class="bar" [style.height.%]="(m.valor / maxFaturamento) * 100"></div>
+          <div class="bar-label">{{ m.mes }}</div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Top clientes por faturamento</div>
+    <div class="ranking">
+      @for (c of topClientes; track c.nome) {
+        <div class="rank-row">
+          <span class="rank-name">{{ c.nome }}</span>
+          <div class="rank-bar"><div class="rank-fill" [style.width.%]="c.pct"></div></div>
+          <span class="rank-val">{{ c.valor }}</span>
+        </div>
+      }
+    </div>
+  </div>
+</div>

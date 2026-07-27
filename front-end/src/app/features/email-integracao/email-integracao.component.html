@@ -1,0 +1,43 @@
+<div class="conn-card card" [class.on]="conectado()">
+  <div class="conn-left">
+    <div class="conn-icon">💌</div>
+    <div>
+      <div class="conn-title">
+        Conta conectada
+        <span class="conn-dot" [class.on]="conectado()"></span>
+      </div>
+      <div class="conn-sub">{{ contaEmail }} · IMAP · sincronizado há 2 min</div>
+    </div>
+  </div>
+  <div class="conn-actions">
+    <button class="btn-ghost">⟳ Sincronizar</button>
+    <button class="btn-ghost">⚙ Configurar</button>
+  </div>
+</div>
+
+<div class="card">
+  <div class="section-header">
+    <div class="section-title">Caixa de entrada — classificada por IA</div>
+    <span class="text-muted inbox-count">{{ emails().length }} mensagens</span>
+  </div>
+
+  @for (m of emails(); track m.assunto) {
+    <div class="email-item" [class.unread]="m.naoLido">
+      <div class="email-avatar" [style.background]="m.bg">{{ m.inicial }}</div>
+      <div class="email-body">
+        <div class="email-row">
+          <div class="email-from">{{ m.de }}</div>
+          <div class="email-time">{{ m.tempo }}</div>
+        </div>
+        <div class="email-subject">{{ m.assunto }}</div>
+        <div class="email-foot">
+          <span class="tag-class">{{ m.classificacao }}</span>
+          @if (m.classificacao === 'Novo orçamento') {
+            <a routerLink="/orcamentos/novo"><button class="email-action-btn primary">✎ Criar orçamento com IA</button></a>
+          }
+          <button class="email-action-btn">👁 Ver e-mail</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

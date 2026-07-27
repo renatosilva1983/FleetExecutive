@@ -1,0 +1,55 @@
+<div class="agenda-filters card">
+  <div class="filter">
+    <label for="di">Início</label>
+    <input id="di" type="date" [(ngModel)]="dataInicio" />
+  </div>
+  <div class="filter">
+    <label for="df">Fim</label>
+    <input id="df" type="date" [(ngModel)]="dataFim" />
+  </div>
+  <button class="btn-primary" (click)="load()">Consultar disponibilidade</button>
+</div>
+
+@if (loading()) {
+  <div class="card"><div class="state-msg"><span class="spinner"></span> Consultando agenda…</div></div>
+} @else if (error()) {
+  <div class="card">
+    <div class="state-msg">
+      Não foi possível consultar a agenda.
+      <button class="btn-ghost" (click)="load()">Tentar novamente</button>
+    </div>
+  </div>
+} @else if (veiculos().length === 0) {
+  <div class="card"><div class="state-msg">Nenhum veículo no período selecionado.</div></div>
+} @else {
+  <div class="agenda-grid">
+    @for (v of veiculos(); track v.vehicleId) {
+      <div class="vehicle-card">
+        <div class="vehicle-head">
+          <div>
+            <div class="vehicle-order">Ordem {{ v.numeroOrdem }}</div>
+            <div class="vehicle-plate">{{ v.placa }} · {{ v.fleetTitulo }}</div>
+          </div>
+          <span class="badge badge-purple">{{ v.statusAdministrativo }}</span>
+        </div>
+
+        @if (v.reservas.length === 0) {
+          <div class="vehicle-free">Livre no período</div>
+        } @else {
+          <div class="bookings">
+            @for (r of v.reservas; track r.orderItemId) {
+              <div class="booking" [class.now]="r.emServicoAgora">
+                <div class="booking-route">{{ r.origem }} → {{ r.destino }}</div>
+                <div class="booking-time">
+                  {{ r.dataHoraIda | date:'dd/MM HH:mm' }}
+                  @if (r.dataHoraVolta) { — {{ r.dataHoraVolta | date:'dd/MM HH:mm' }} }
+                </div>
+                @if (r.emServicoAgora) { <span class="booking-now">● Em serviço agora</span> }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+}

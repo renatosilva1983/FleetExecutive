@@ -1,0 +1,61 @@
+<div class="toolbar">
+  <button class="btn-primary">+ Novo cliente</button>
+  <div class="search-bar">
+    <input
+      type="text"
+      placeholder="🔍 Buscar por nome ou e-mail…"
+      [value]="busca()"
+      (input)="busca.set($any($event.target).value)"
+      (keyup.enter)="load()"
+    />
+  </div>
+  <div class="toolbar-right">
+    <button class="btn-ghost" (click)="load()">Buscar</button>
+  </div>
+</div>
+
+<div class="stat-cards">
+  <div class="stat-card">
+    <div><div class="stat-val">{{ total() }}</div><div class="stat-lbl">Total de clientes</div></div>
+    <div class="stat-icon" style="background:#6d28d920;color:#6d28d9">👥</div>
+  </div>
+  <div class="stat-card">
+    <div><div class="stat-val">{{ ativos }}</div><div class="stat-lbl">Ativos (página)</div></div>
+    <div class="stat-icon" style="background:#10b98120;color:#059669">✓</div>
+  </div>
+</div>
+
+<div class="card table-card">
+  @if (loading()) {
+    <div class="state-msg"><span class="spinner"></span> Carregando clientes…</div>
+  } @else if (error()) {
+    <div class="state-msg">
+      Não foi possível carregar os clientes.
+      <button class="btn-ghost" (click)="load()">Tentar novamente</button>
+    </div>
+  } @else if (clientes().length === 0) {
+    <div class="state-msg">Nenhum cliente encontrado.</div>
+  } @else {
+    <table>
+      <thead>
+        <tr><th>Nome</th><th>Tipo</th><th>E-mail</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        @for (c of clientes(); track c.id) {
+          <tr>
+            <td class="text-strong">{{ c.nome }}</td>
+            <td><span class="badge badge-purple">{{ tipoLabel(c.tipo) }}</span></td>
+            <td class="text-muted">{{ c.email }}</td>
+            <td>
+              @if (c.ativo) {
+                <span class="badge badge-success">Ativo</span>
+              } @else {
+                <span class="badge badge-danger">Inativo</span>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>

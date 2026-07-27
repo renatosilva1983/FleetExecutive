@@ -1,0 +1,54 @@
+<div class="mon-header">
+  <div class="live-badge"><div class="live-dot"></div> AO VIVO</div>
+  <span class="mon-sub">Atualização automática · última sincronização há instantes</span>
+  <button class="btn-ghost mon-refresh">⟳ Sincronizar agora</button>
+</div>
+
+<div class="stat-cards">
+  <div class="stat-card">
+    <div><div class="stat-val">{{ emServico }}</div><div class="stat-lbl">Em serviço agora</div></div>
+    <div class="stat-icon" style="background:#3b82f620;color:#2563eb">🚌</div>
+  </div>
+  <div class="stat-card">
+    <div><div class="stat-val">{{ alertas }}</div><div class="stat-lbl">Alertas</div></div>
+    <div class="stat-icon" style="background:#ef444420;color:#dc2626">⚠</div>
+  </div>
+  <div class="stat-card">
+    <div><div class="stat-val">{{ finalizados }}</div><div class="stat-lbl">Finalizados hoje</div></div>
+    <div class="stat-icon" style="background:#10b98120;color:#059669">✅</div>
+  </div>
+  <div class="stat-card">
+    <div><div class="stat-val">{{ servicos().length }}</div><div class="stat-lbl">Serviços do dia</div></div>
+    <div class="stat-icon" style="background:#6d28d920;color:#6d28d9">📹</div>
+  </div>
+</div>
+
+<div class="mon-grid">
+  @for (s of servicos(); track s.id) {
+    <div class="mon-card" [class.alert]="s.alerta">
+      <div class="mon-card-head">
+        <div>
+          <div class="mon-id">Serviço {{ s.id }} — Pedido {{ s.pedido }}</div>
+          <div class="mon-client">{{ s.cliente }}</div>
+        </div>
+        <div class="mon-driver-dot" [class.online]="s.online" [class.offline]="!s.online"></div>
+      </div>
+      <div class="mon-route">{{ s.rota }}</div>
+
+      <div class="mon-steps">
+        @for (pip of pips(s.passo); track $index) {
+          <div class="mon-pip" [class.done]="pip === 'done'" [class.active]="pip === 'active'"></div>
+        }
+      </div>
+      <div class="mon-step-label">{{ passos[s.passo] }}</div>
+
+      <div class="mon-status">{{ s.status }}</div>
+      @if (s.eta) { <div class="mon-eta">🕒 {{ s.eta }}</div> }
+
+      <div class="mon-driver">
+        <span class="mon-driver-name">👤 {{ s.motorista }}</span>
+        <span class="mon-vehicle">{{ s.veiculo }}</span>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,44 @@
+<div class="nps-top">
+  <div class="nps-score-card">
+    <div class="nps-score-label">NPS do mês</div>
+    <div class="nps-score-val">{{ npsScore }}</div>
+    <div class="nps-score-tag">Zona de excelência</div>
+  </div>
+
+  <div class="nps-summary card">
+    <div class="nps-summary-head">
+      <div>
+        <div class="nps-media">{{ mediaEstrelas }} <span class="nps-media-star">★</span></div>
+        <div class="nps-media-sub">{{ totalRespostas }} respostas neste mês</div>
+      </div>
+    </div>
+    <div class="nps-dist">
+      @for (d of distribuicao; track d.estrelas) {
+        <div class="dist-row">
+          <span class="dist-label">{{ d.estrelas }}★</span>
+          <div class="dist-bar"><div class="dist-fill" [style.width.%]="d.pct"></div></div>
+          <span class="dist-qtd">{{ d.qtd }}</span>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">Avaliações recentes</div>
+  <div class="reviews">
+    @for (a of avaliacoes(); track a.servico) {
+      <div class="review-card">
+        <div class="review-head">
+          <span class="review-client">{{ a.cliente }}</span>
+          <span class="review-stars">
+            @for (on of estrelasArray(a.nota); track $index) { <span [class.off]="!on">★</span> }
+            <span class="review-note">{{ a.nota.toFixed(1) }}</span>
+          </span>
+        </div>
+        <div class="review-text">"{{ a.texto }}"</div>
+        <div class="review-ref">{{ a.servico }} · {{ a.quando }}</div>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,39 @@
+.conn-card { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.conn-card.on { border-color: #10b98150; background: #10b9810a; }
+.conn-left { display: flex; align-items: center; gap: 14px; }
+.conn-icon {
+  width: 44px; height: 44px; border-radius: 12px; background: #6d28d915;
+  display: flex; align-items: center; justify-content: center; font-size: 20px;
+}
+.conn-title { font-size: 14px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
+.conn-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--text-muted); }
+.conn-dot.on { background: var(--accent); box-shadow: 0 0 0 3px #05966922; }
+.conn-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.conn-actions { display: flex; gap: 8px; }
+
+.inbox-count { font-size: 12px; }
+
+.email-item {
+  display: flex; align-items: flex-start; gap: 12px; padding: 12px;
+  border-radius: 10px; background: #f6f5fc; border: 1px solid var(--card-border);
+  margin-bottom: 8px; cursor: pointer; transition: border-color 0.15s;
+}
+.email-item:hover { border-color: var(--primary-light); }
+.email-item.unread { border-left: 3px solid var(--primary-light); }
+.email-avatar {
+  width: 38px; height: 38px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 800; color: #fff; flex-shrink: 0;
+}
+.email-body { flex: 1; }
+.email-row { display: flex; align-items: center; justify-content: space-between; }
+.email-from { font-size: 13px; font-weight: 600; color: var(--text); }
+.email-time { font-size: 11px; color: var(--text-muted); }
+.email-subject { font-size: 12.5px; color: var(--text-muted); margin: 2px 0 8px; }
+.email-foot { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.tag-class { font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: #ede9fe; color: #5b21b6; border: 1px solid #ddd6fe; }
+.email-action-btn {
+  padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer;
+  font-weight: 600; border: 1px solid var(--card-border); background: transparent; color: var(--text-muted);
+}
+.email-action-btn.primary { border-color: var(--primary); color: var(--primary-light); background: #6d28d910; }

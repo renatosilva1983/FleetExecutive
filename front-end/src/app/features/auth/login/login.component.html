@@ -1,0 +1,47 @@
+<div class="login-wrap">
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="logo-mark">B</div>
+      <div>
+        <div class="logo-text">BESSA</div>
+        <div class="logo-sub">Orgulho em transportar você!</div>
+      </div>
+    </div>
+
+    <h1 class="login-title">Entrar no painel</h1>
+    <p class="login-sub">Gestão de frota executiva — FleetExecutive</p>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="field">
+        <label for="email">E-mail</label>
+        <input id="email" type="email" formControlName="email" placeholder="voce@empresa.com.br" autocomplete="username" />
+        @if (form.controls.email.touched && form.controls.email.invalid) {
+          <small class="field-error">Informe um e-mail válido.</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="senha">Senha</label>
+        <input id="senha" type="password" formControlName="senha" placeholder="••••••••" autocomplete="current-password" />
+        @if (form.controls.senha.touched && form.controls.senha.invalid) {
+          <small class="field-error">Informe sua senha.</small>
+        }
+      </div>
+
+      <label class="remember">
+        <input type="checkbox" formControlName="manterConectado" />
+        <span>Manter conectado</span>
+      </label>
+
+      @if (errorMsg()) {
+        <div class="login-error">{{ errorMsg() }}</div>
+      }
+
+      <button class="btn-primary login-submit" type="submit" [disabled]="loading()">
+        @if (loading()) { <span class="spinner"></span> Entrando… } @else { Entrar }
+      </button>
+    </form>
+
+    <p class="login-foot">Esqueceu a senha? Contate o administrador da sua empresa.</p>
+  </div>
+</div>

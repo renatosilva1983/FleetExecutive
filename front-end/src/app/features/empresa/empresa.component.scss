@@ -1,0 +1,9 @@
+.empresa-form { max-width: 720px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.section-gap { margin-top: 20px; }
+.empresa-actions { margin-top: 20px; display: flex; justify-content: flex-end; }
+
+@media (max-width: 720px) {
+  .form-row { grid-template-columns: 1fr; }
+}

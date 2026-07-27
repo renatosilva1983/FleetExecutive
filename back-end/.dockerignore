@@ -1,0 +1,23 @@
+# Arquivos e pastas que NÃO devem ser enviados ao contexto do build Docker.
+# Isso deixa o build mais rápido e evita copiar binários locais para dentro
+# da imagem (que seriam recompilados de qualquer forma).
+
+# Saídas de compilação locais
+**/bin/
+**/obj/
+**/out/
+
+# Metadados de controle de versão e editores
+.git/
+.gitignore
+.vs/
+.vscode/
+.idea/
+
+# O próprio Docker
+Dockerfile
+.dockerignore
+
+# Configurações locais que não devem entrar na imagem
+**/appsettings.Development.json
+**/*.user

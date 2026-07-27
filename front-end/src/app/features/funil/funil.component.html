@@ -1,0 +1,42 @@
+<div class="toolbar">
+  <a routerLink="/orcamentos/novo"><button class="btn-primary">+ Novo orçamento</button></a>
+  <div class="toolbar-right">
+    <button class="btn-ghost" (click)="load()">⟳ Atualizar</button>
+  </div>
+</div>
+
+@if (loading()) {
+  <div class="card"><div class="state-msg"><span class="spinner"></span> Carregando funil…</div></div>
+} @else if (error()) {
+  <div class="card">
+    <div class="state-msg">
+      Não foi possível carregar o funil.
+      <button class="btn-ghost" (click)="load()">Tentar novamente</button>
+    </div>
+  </div>
+} @else {
+  <div class="funnel">
+    @for (e of estagios; track e.status) {
+      <div class="funnel-col">
+        <div class="funnel-head">
+          <span>{{ e.titulo }}</span>
+          <span class="funnel-count">{{ porEstagio()[e.status].length }}</span>
+        </div>
+        <div class="funnel-total">{{ total(e.status) | currency:'BRL':'symbol':'1.0-0' }}</div>
+        <div class="funnel-body">
+          @for (q of porEstagio()[e.status]; track q.id) {
+            <a class="quote-card" [routerLink]="['/pedidos']">
+              <div class="quote-origem">{{ q.origem }}</div>
+              <div class="quote-val">{{ q.valorEstimado | currency:'BRL':'symbol':'1.0-0' }}</div>
+              <div class="quote-data">
+                {{ q.dataServico ? (q.dataServico | date:'dd/MM/yyyy') : ('Criado ' + (q.createdAt | date:'dd/MM')) }}
+              </div>
+            </a>
+          } @empty {
+            <div class="funnel-empty">—</div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+}

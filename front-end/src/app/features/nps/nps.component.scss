@@ -1,0 +1,37 @@
+.nps-top { display: grid; grid-template-columns: 260px 1fr; gap: 18px; margin-bottom: 18px; }
+
+.nps-score-card {
+  background: linear-gradient(135deg, #3b0764, #6d28d9 60%, #8b5cf6);
+  border-radius: 18px; padding: 24px; color: #fff; display: flex; flex-direction: column; justify-content: center;
+}
+.nps-score-label { font-size: 12.5px; color: #ffffffcc; }
+.nps-score-val { font-size: 48px; font-weight: 900; line-height: 1.1; }
+.nps-score-tag { font-size: 12px; color: #ffffffdd; margin-top: 6px; }
+
+.nps-summary { display: flex; flex-direction: column; justify-content: center; }
+.nps-summary-head { margin-bottom: 14px; }
+.nps-media { font-size: 30px; font-weight: 800; color: var(--text); }
+.nps-media-star { color: #fbbf24; font-size: 24px; }
+.nps-media-sub { font-size: 12px; color: var(--text-muted); }
+
+.nps-dist { display: flex; flex-direction: column; gap: 8px; }
+.dist-row { display: flex; align-items: center; gap: 10px; }
+.dist-label { font-size: 12px; color: var(--text-muted); width: 28px; }
+.dist-bar { flex: 1; height: 8px; background: #ece9f7; border-radius: 5px; overflow: hidden; }
+.dist-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--primary-light)); border-radius: 5px; }
+.dist-qtd { font-size: 12px; color: var(--text); width: 32px; text-align: right; font-weight: 600; }
+
+.reviews { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.review-card { background: #f6f5fc; border: 1px solid var(--card-border); border-radius: 10px; padding: 14px; }
+.review-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.review-client { font-size: 13px; font-weight: 600; color: var(--text); }
+.review-stars { color: #fbbf24; font-size: 14px; }
+.review-stars .off { color: #d8d3ea; }
+.review-note { font-size: 11px; color: var(--text-muted); }
+.review-text { font-size: 12.5px; color: var(--text-muted); }
+.review-ref { font-size: 11px; color: #8a86b8; margin-top: 4px; }
+
+@media (max-width: 900px) {
+  .nps-top { grid-template-columns: 1fr; }
+  .reviews { grid-template-columns: 1fr; }
+}

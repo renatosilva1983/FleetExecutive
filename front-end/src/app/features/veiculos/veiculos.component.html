@@ -1,0 +1,59 @@
+<div class="toolbar">
+  <button class="btn-primary">+ Novo veículo</button>
+  <div class="search-bar">
+    <input
+      type="text"
+      placeholder="🔍 Buscar por placa ou nº de ordem…"
+      [value]="busca()"
+      (input)="busca.set($any($event.target).value)"
+      (keyup.enter)="load()"
+    />
+  </div>
+  <div class="toolbar-right">
+    <button class="btn-ghost" (click)="load()">Buscar</button>
+  </div>
+</div>
+
+<div class="stat-cards">
+  <div class="stat-card">
+    <div><div class="stat-val">{{ total() }}</div><div class="stat-lbl">Total de veículos</div></div>
+    <div class="stat-icon" style="background:#6d28d920;color:#6d28d9">🚌</div>
+  </div>
+  <div class="stat-card">
+    <div><div class="stat-val">{{ disponiveis }}</div><div class="stat-lbl">Disponíveis (página)</div></div>
+    <div class="stat-icon" style="background:#10b98120;color:#059669">✓</div>
+  </div>
+</div>
+
+<div class="card table-card">
+  @if (loading()) {
+    <div class="state-msg"><span class="spinner"></span> Carregando veículos…</div>
+  } @else if (error()) {
+    <div class="state-msg">
+      Não foi possível carregar os veículos.
+      <button class="btn-ghost" (click)="load()">Tentar novamente</button>
+    </div>
+  } @else if (veiculos().length === 0) {
+    <div class="state-msg">Nenhum veículo encontrado.</div>
+  } @else {
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>Nº Ordem</th><th>Placa</th><th>Frota</th><th>Tipo</th><th>Capacidade</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          @for (v of veiculos(); track v.id) {
+            <tr>
+              <td class="text-strong">{{ v.numeroOrdem }}</td>
+              <td>{{ v.placa }}</td>
+              <td class="text-muted">{{ v.fleetTitulo }}</td>
+              <td>{{ v.tipo }}</td>
+              <td>{{ v.capacidade }} lugares</td>
+              <td><span class="badge" [class]="badge(v.status).css">{{ badge(v.status).label }}</span></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

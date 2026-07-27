@@ -1,0 +1,107 @@
+<div class="tabs">
+  <button class="tab" [class.active]="aba() === 'cobrancas'" (click)="selecionar('cobrancas')">Cobranças</button>
+  <button class="tab" [class.active]="aba() === 'comissoes'" (click)="selecionar('comissoes')">Comissões</button>
+  <button class="tab" [class.active]="aba() === 'faturas'" (click)="selecionar('faturas')">Faturas</button>
+  <div class="toolbar-right">
+    <button class="btn-ghost" (click)="selecionar(aba())">⟳ Atualizar</button>
+  </div>
+</div>
+
+<div class="card table-card">
+  @if (loading()) {
+    <div class="state-msg"><span class="spinner"></span> Carregando…</div>
+  } @else if (error()) {
+    <div class="state-msg">
+      Não foi possível carregar os dados.
+      <button class="btn-ghost" (click)="selecionar(aba())">Tentar novamente</button>
+    </div>
+  } @else {
+    @switch (aba()) {
+      @case ('cobrancas') {
+        @if (cobrancas().length === 0) {
+          <div class="state-msg">Nenhuma cobrança encontrada.</div>
+        } @else {
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr><th>Tipo</th><th>Origem</th><th>Vencimento</th><th>Valor</th><th>Status</th><th></th></tr>
+              </thead>
+              <tbody>
+                @for (c of cobrancas(); track c.id) {
+                  <tr>
+                    <td>{{ c.tipo }}</td>
+                    <td class="text-muted">{{ c.origem }}</td>
+                    <td>{{ c.venceEm | date:'dd/MM/yyyy' }}</td>
+                    <td class="text-strong">{{ c.valor | currency:'BRL':'symbol':'1.2-2' }}</td>
+                    <td><span class="badge" [class]="badge(c.status).css">{{ badge(c.status).label }}</span></td>
+                    <td>
+                      @if (!c.pagoEm) {
+                        <button class="btn-link" (click)="registrarRecebimento(c)">Registrar recebimento</button>
+                      } @else {
+                        <span class="text-muted">Pago em {{ c.pagoEm | date:'dd/MM' }}</span>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      }
+      @case ('comissoes') {
+        @if (comissoes().length === 0) {
+          <div class="state-msg">Nenhuma comissão encontrada.</div>
+        } @else {
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr><th>Recebedor</th><th>Tipo</th><th>%</th><th>Valor</th><th>Status</th><th></th></tr>
+              </thead>
+              <tbody>
+                @for (c of comissoes(); track c.id) {
+                  <tr>
+                    <td>{{ c.recebedorTipo }}</td>
+                    <td>{{ c.tipo }}</td>
+                    <td>{{ c.percentual }}%</td>
+                    <td class="text-strong">{{ c.valor | currency:'BRL':'symbol':'1.2-2' }}</td>
+                    <td><span class="badge" [class]="badge(c.status).css">{{ badge(c.status).label }}</span></td>
+                    <td>
+                      @if (!c.pagoEm) {
+                        <button class="btn-link" (click)="marcarComissaoPaga(c)">Marcar paga</button>
+                      } @else {
+                        <span class="text-muted">Paga</span>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      }
+      @case ('faturas') {
+        @if (faturas().length === 0) {
+          <div class="state-msg">Nenhuma fatura encontrada.</div>
+        } @else {
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr><th>Fatura</th><th>Pedido</th><th>Status</th><th>Gerada em</th></tr>
+              </thead>
+              <tbody>
+                @for (f of faturas(); track f.id) {
+                  <tr>
+                    <td class="text-strong">#{{ f.id.slice(0, 8) }}</td>
+                    <td class="text-muted">#{{ f.orderId.slice(0, 8) }}</td>
+                    <td><span class="badge" [class]="badge(f.status).css">{{ badge(f.status).label }}</span></td>
+                    <td>{{ f.geradoEm ? (f.geradoEm | date:'dd/MM/yyyy HH:mm') : '—' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      }
+    }
+  }
+</div>

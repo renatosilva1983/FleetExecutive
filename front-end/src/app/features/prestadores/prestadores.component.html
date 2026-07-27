@@ -1,0 +1,65 @@
+<div class="toolbar">
+  <button class="btn-primary">+ Novo prestador</button>
+  <div class="search-bar">
+    <input
+      type="text"
+      placeholder="🔍 Buscar prestador…"
+      [value]="busca()"
+      (input)="busca.set($any($event.target).value)"
+      (keyup.enter)="load()"
+    />
+  </div>
+  <div class="toolbar-right">
+    <button class="btn-ghost" (click)="load()">Buscar</button>
+  </div>
+</div>
+
+<div class="stat-cards">
+  <div class="stat-card">
+    <div><div class="stat-val">{{ total() }}</div><div class="stat-lbl">Total de prestadores</div></div>
+    <div class="stat-icon" style="background:#6d28d920;color:#6d28d9">👤</div>
+  </div>
+  <div class="stat-card">
+    <div><div class="stat-val">{{ indicados }}</div><div class="stat-lbl">Por indicação (página)</div></div>
+    <div class="stat-icon" style="background:#10b98120;color:#059669">⭐</div>
+  </div>
+</div>
+
+<div class="card table-card">
+  @if (loading()) {
+    <div class="state-msg"><span class="spinner"></span> Carregando prestadores…</div>
+  } @else if (error()) {
+    <div class="state-msg">
+      Não foi possível carregar os prestadores.
+      <button class="btn-ghost" (click)="load()">Tentar novamente</button>
+    </div>
+  } @else if (prestadores().length === 0) {
+    <div class="state-msg">Nenhum prestador encontrado.</div>
+  } @else {
+    <table>
+      <thead>
+        <tr><th>Nome</th><th>Tipo</th><th>Telefone</th><th>Comissão</th><th>Indicação</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        @for (p of prestadores(); track p.id) {
+          <tr>
+            <td class="text-strong">{{ p.nome }}</td>
+            <td><span class="badge badge-purple">{{ p.tipo }}</span></td>
+            <td class="text-muted">{{ p.telefone || '—' }}</td>
+            <td>{{ p.comissaoPercentual | number:'1.0-2' }}%</td>
+            <td>
+              @if (p.indicacao) { <span class="badge badge-info">Sim</span> } @else { <span class="text-muted">—</span> }
+            </td>
+            <td>
+              @if (p.ativo) {
+                <span class="badge badge-success">Ativo</span>
+              } @else {
+                <span class="badge badge-danger">Inativo</span>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>

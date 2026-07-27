@@ -1,0 +1,77 @@
+<div class="detail-top">
+  <a routerLink="/pedidos" class="btn-ghost">← Voltar</a>
+</div>
+
+@if (loading()) {
+  <div class="card"><div class="state-msg"><span class="spinner"></span> Carregando pedido…</div></div>
+} @else if (error() || !pedido()) {
+  <div class="card">
+    <div class="state-msg">
+      Não foi possível carregar o pedido.
+      <button class="btn-ghost" (click)="load()">Tentar novamente</button>
+    </div>
+  </div>
+} @else {
+  @let p = pedido()!;
+  <div class="detail-header card">
+    <div>
+      <div class="detail-id">Pedido #{{ p.id.slice(0, 8) }}</div>
+      <div class="detail-sub">Origem: {{ p.origem }} · Criado em {{ p.createdAt | date:'dd/MM/yyyy HH:mm' }}</div>
+    </div>
+    <div class="detail-status">
+      <span class="badge" [class]="badge(p.statusComercial).css">{{ badge(p.statusComercial).label }}</span>
+      <span class="badge badge-info">{{ p.statusOperacional }}</span>
+    </div>
+    <div class="detail-total">
+      <div class="detail-total-lbl">Valor total</div>
+      <div class="detail-total-val">{{ p.valorTotal | currency:'BRL':'symbol':'1.2-2' }}</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Serviços do pedido</div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>Tipo</th><th>Trajeto</th><th>Ida</th><th>Volta</th><th>Valor</th><th>Acréscimo</th><th>Subtotal</th></tr>
+        </thead>
+        <tbody>
+          @for (item of p.itens; track item.id) {
+            <tr>
+              <td>{{ item.tipo }}</td>
+              <td>{{ item.origem }} → {{ item.destino }}</td>
+              <td>{{ item.dataHoraIda | date:'dd/MM HH:mm' }}</td>
+              <td>{{ item.dataHoraVolta ? (item.dataHoraVolta | date:'dd/MM HH:mm') : '—' }}</td>
+              <td>{{ item.valorServico | currency:'BRL':'symbol':'1.2-2' }}</td>
+              <td>{{ item.acrescimo | currency:'BRL':'symbol':'1.2-2' }}</td>
+              <td class="text-strong">{{ item.subtotal | currency:'BRL':'symbol':'1.2-2' }}</td>
+            </tr>
+          } @empty {
+            <tr><td colspan="7" class="text-muted">Nenhum serviço lançado.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Histórico</div>
+    @if (p.historico.length === 0) {
+      <div class="text-muted">Sem eventos registrados.</div>
+    } @else {
+      <div class="timeline">
+        @for (h of p.historico; track h.id) {
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-body">
+              <div class="timeline-evt">{{ h.tipoEvento }}</div>
+              <div class="timeline-desc">{{ h.descricao }}</div>
+              @if (h.justificativa) { <div class="timeline-just">Justificativa: {{ h.justificativa }}</div> }
+              <div class="timeline-time">{{ h.criadoEm | date:'dd/MM/yyyy HH:mm' }}</div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+}

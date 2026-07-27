@@ -1,0 +1,24 @@
+.funnel { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; align-items: start; }
+.funnel-col { background: #f6f5fc; border: 1px solid var(--card-border); border-radius: 14px; padding: 12px; }
+.funnel-head {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 12.5px; font-weight: 700; color: var(--text); padding: 0 2px;
+}
+.funnel-count { background: var(--primary); color: #fff; font-size: 11px; padding: 1px 8px; border-radius: 10px; }
+.funnel-total { font-size: 12px; font-weight: 700; color: var(--accent); margin: 4px 2px 10px; }
+.funnel-body { display: flex; flex-direction: column; gap: 8px; }
+.funnel-empty { text-align: center; color: var(--text-muted); font-size: 12px; padding: 10px; }
+
+.quote-card {
+  display: block; text-decoration: none;
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  border-radius: 10px; padding: 10px 12px; transition: border-color 0.15s;
+}
+.quote-card:hover { border-color: var(--primary-light); }
+.quote-origem { font-size: 12.5px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.quote-val { font-size: 13px; font-weight: 800; color: var(--primary); }
+.quote-data { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+@media (max-width: 1100px) {
+  .funnel { grid-template-columns: repeat(2, 1fr); }
+}

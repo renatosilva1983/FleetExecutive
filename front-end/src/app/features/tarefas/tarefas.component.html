@@ -1,0 +1,49 @@
+<div class="toolbar">
+  <button class="btn-primary">+ Nova tarefa</button>
+  <div class="toolbar-right">
+    <button class="btn-ghost" (click)="load()">⟳ Atualizar</button>
+  </div>
+</div>
+
+@if (loading()) {
+  <div class="card"><div class="state-msg"><span class="spinner"></span> Carregando tarefas…</div></div>
+} @else if (error()) {
+  <div class="card">
+    <div class="state-msg">
+      Não foi possível carregar as tarefas.
+      <button class="btn-ghost" (click)="load()">Tentar novamente</button>
+    </div>
+  </div>
+} @else {
+  <div class="board">
+    @for (col of colunas; track col.status) {
+      <div class="board-col">
+        <div class="board-col-head">
+          <span>{{ col.titulo }}</span>
+          <span class="board-count">{{ porStatus()[col.status].length }}</span>
+        </div>
+        <div class="board-col-body">
+          @for (t of porStatus()[col.status]; track t.id) {
+            <div class="task-card">
+              <div class="task-top">
+                <span class="task-prio" [class]="prioridadeCss(t.prioridade)">{{ t.prioridade }}</span>
+                @if (t.prazo) {
+                  <span class="task-prazo">📅 {{ t.prazo | date:'dd/MM' }}</span>
+                }
+              </div>
+              <div class="task-title">{{ t.titulo }}</div>
+              @if (t.descricao) { <div class="task-desc">{{ t.descricao }}</div> }
+              @if (t.status !== 'Concluida') {
+                <button class="btn-link task-advance" (click)="avancar(t)">
+                  {{ t.status === 'Aberta' ? 'Iniciar →' : 'Concluir ✓' }}
+                </button>
+              }
+            </div>
+          } @empty {
+            <div class="board-empty">Sem tarefas</div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+}

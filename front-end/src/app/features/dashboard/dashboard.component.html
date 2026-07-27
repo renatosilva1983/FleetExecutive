@@ -1,0 +1,144 @@
+<div class="content-header">
+  <span class="period-label">📅 {{ periodo }}</span>
+  <button class="btn-ghost">✎ Editar período</button>
+</div>
+
+<!-- Welcome + Stats -->
+<div class="top-row">
+  <div class="welcome-card">
+    <div class="welcome-title">Olá, Anderson! 🎉</div>
+    <div class="welcome-sub">
+      Você tem 3 serviços em andamento hoje e 2 novos e-mails de clientes aguardando.
+    </div>
+    <button class="btn-white">📊 Ver Relatório</button>
+  </div>
+  <div class="stats-card">
+    <div class="stats-heading">Estatísticas do mês</div>
+    <div class="stats-grid">
+      @for (s of stats; track s.label) {
+        <div class="stat-block">
+          <div class="stat-icon" [style.background]="s.bg">{{ s.icon }}</div>
+          <div class="stat-val" [class.stat-val--sm]="s.small">{{ s.valor }}</div>
+          <div class="stat-lbl">{{ s.label }}</div>
+          <div class="stat-trend-up">{{ s.trend }}</div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- Caixa de entrada de orçamentos -->
+<div class="email-panel">
+  <div class="email-panel-header">
+    <div class="email-panel-title">
+      <span>💌 Caixa de Entrada — Novos Pedidos de Orçamento</span>
+      <div class="email-dot"></div>
+      <span class="email-sync">sincronizado há 2 min</span>
+    </div>
+    <div class="email-panel-actions">
+      <button class="btn-ghost">⟳ Sincronizar</button>
+      <a routerLink="/email-integracao"><button class="btn-ghost">Ver todos os e-mails</button></a>
+    </div>
+  </div>
+
+  @for (mail of inbox; track mail.de) {
+    <div class="email-item unread">
+      <div class="email-avatar" [style.background]="mail.bg">{{ mail.inicial }}</div>
+      <div class="email-body">
+        <div class="email-row">
+          <div class="email-from">{{ mail.de }}</div>
+          <div class="email-time">{{ mail.tempo }}</div>
+        </div>
+        <div class="email-subject">{{ mail.assunto }}</div>
+        <div class="email-actions">
+          <a routerLink="/orcamentos/novo">
+            <button class="email-action-btn primary">✎ Criar orçamento com sugestão de IA</button>
+          </a>
+          <button class="email-action-btn">👁 Ver e-mail</button>
+          @if (mail.vincular) {
+            <button class="email-action-btn">👥 Vincular cliente</button>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>
+
+<!-- Serviços em andamento -->
+<div class="monitoring-panel">
+  <div class="monitoring-header">
+    <div class="monitoring-title">
+      📹 Serviços em Andamento Hoje
+      <div class="live-badge"><div class="live-dot"></div> AO VIVO</div>
+    </div>
+    <a routerLink="/monitoramento"><button class="btn-ghost">👀 Painel completo</button></a>
+  </div>
+  <div class="service-monitors">
+    @for (svc of servicos; track svc.id) {
+      <div class="service-card">
+        <div class="service-id">{{ svc.id }}</div>
+        <div class="service-client">{{ svc.cliente }}</div>
+        <div class="service-route">{{ svc.rota }}</div>
+        <div class="service-status-bar">
+          @for (pip of pips(svc.passo); track $index) {
+            <div class="step-pip" [class.done]="pip === 'done'" [class.active]="pip === 'active'"></div>
+          }
+        </div>
+        <div class="service-status-text">{{ svc.status }}</div>
+        <div class="service-driver" [class.warn]="svc.alerta">
+          @if (!svc.alerta) { <div class="driver-dot-online"></div> }
+          {{ svc.motorista }}
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Duas colunas -->
+<div class="two-col">
+  <div class="section-card">
+    <div class="section-header">
+      <div class="section-title">⚠ Pendências Financeiras</div>
+      <a routerLink="/financeiro"><button class="btn-link">Ver todos ({{ pendencias.length }})</button></a>
+    </div>
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Cliente</th><th>Status</th><th>Valor</th></tr>
+      </thead>
+      <tbody>
+        @for (p of pendencias; track p.id) {
+          <tr>
+            <td><a class="id-link" [routerLink]="['/pedidos', p.id]">#{{ p.id }}</a></td>
+            <td>{{ p.cliente }}</td>
+            <td><span class="badge badge-danger">Cobrança</span></td>
+            <td class="text-strong">{{ p.valor }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-card">
+    <div class="section-header">
+      <div class="section-title">⭐ Avaliações Recentes</div>
+      <a routerLink="/nps"><button class="btn-link">Ver todas</button></a>
+    </div>
+    <div class="reviews">
+      @for (a of avaliacoes; track a.cliente) {
+        <div class="review-card">
+          <div class="review-head">
+            <span class="review-client">{{ a.cliente }}</span>
+            <span class="review-stars">
+              @for (on of stars(a.nota); track $index) {
+                <span [class.off]="!on">★</span>
+              }
+              <span class="review-note">{{ a.nota.toFixed(1) }}</span>
+            </span>
+          </div>
+          <div class="review-text">"{{ a.texto }}"</div>
+          <div class="review-ref">{{ a.ref }}</div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

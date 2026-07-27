@@ -1,0 +1,205 @@
+<div class="wizard-wrap">
+  <div class="wizard-card">
+
+    @if (bannerVisivel()) {
+      <div class="email-origin-banner">
+        <div class="email-icon">💌</div>
+        <div>
+          <div class="email-banner-title">✨ Orçamento originado de e-mail</div>
+          <div class="email-banner-body">
+            De: <strong>insper&#64;email.com.br</strong> · Recebido há 18 min<br />
+            Assunto: <strong>Solicitação de orçamento — 45 pessoas — SP × Campos do Jordão — 15/08/2026</strong><br />
+            <span class="email-banner-ok">✅ Dados preenchidos automaticamente pela IA com base no e-mail</span>
+          </div>
+        </div>
+        <button class="dismiss-btn" (click)="bannerVisivel.set(false)">✕</button>
+      </div>
+    }
+
+    <!-- Steps -->
+    <div class="steps">
+      @for (s of steps; track s.label; let last = $last) {
+        <div class="step">
+          <div class="step-num" [class.active]="s.state === 'active'" [class.done]="s.state === 'done'">{{ s.num }}</div>
+          <div class="step-label" [class.active]="s.state === 'active'">{{ s.label }}</div>
+        </div>
+        @if (!last) {
+          <div class="step-line" [class.done]="s.state === 'done'"></div>
+        }
+      }
+    </div>
+
+    <div class="section-title">Detalhes do serviço</div>
+    <div class="section-sub">Dados preenchidos automaticamente pela IA — revise e ajuste se necessário</div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Tipo de serviço</label>
+        <select>
+          <option>Transporte Executivo</option>
+          <option>Receptivo</option>
+          <option>Guia de turismo</option>
+          <option>Percurso turístico</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Subtipo</label>
+        <select>
+          <option>Ida e Volta</option>
+          <option>Só Ida</option>
+          <option>Transfer</option>
+          <option>Fretamento contínuo</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="sub-section-title">📅 Ida</div>
+    <div class="form-row">
+      <div class="form-group"><label>Data de ida</label><input type="date" value="2026-08-15" /></div>
+      <div class="form-group"><label>Hora de ida</label><input type="time" value="07:00" /></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Origem</label><input type="text" value="São Paulo, SP" /></div>
+      <div class="form-group"><label>Destino</label><input type="text" value="Campos do Jordão, SP" /></div>
+    </div>
+
+    <div class="sub-section-title">📅 Volta <span class="muted-inline">(Ida e Volta selecionado)</span></div>
+    <div class="form-row">
+      <div class="form-group"><label>Data de volta</label><input type="date" value="2026-08-16" /></div>
+      <div class="form-group"><label>Hora de volta</label><input type="time" value="18:00" /></div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group"><label>Número de passageiros</label><input type="number" value="45" /></div>
+      <div class="form-group">
+        <label>Tipo de veículo preferido</label>
+        <select>
+          <option selected>Ônibus Executivo (46–50L)</option>
+          <option>Micro Ônibus (26L)</option>
+          <option>Van Executiva (15L)</option>
+          <option>Sedan de Luxo</option>
+          <option>Sedan Comum</option>
+          <option>Sem preferência</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="sub-section-title">⚙ Características especiais do serviço</div>
+    <div class="feat-grid">
+      @for (f of features; track f.titulo) {
+        <label class="feat-item" [class.checked]="f.checked">
+          <input type="checkbox" [checked]="f.checked" (change)="f.checked = !f.checked" />
+          <div>
+            <div class="feat-item-title">{{ f.icon }} {{ f.titulo }}</div>
+            <div class="feat-item-desc">{{ f.desc }}</div>
+          </div>
+        </label>
+      }
+    </div>
+
+    <div class="idioma-field">
+      <div class="form-group idioma-group">
+        <label>Idioma(s) requerido(s)</label>
+        <input type="text" value="Inglês" placeholder="Ex: Inglês, Espanhol" />
+      </div>
+      <div class="idioma-hint">💬 A IA detectou menção a "bilingual staff" no e-mail original</div>
+    </div>
+
+    <div class="form-row form-obs">
+      <div class="form-group full">
+        <label>Observações adicionais do cliente</label>
+        <textarea class="obs-area" placeholder="Informações complementares...">Grupos de alunos de pós-graduação. Solicita wi-fi e poltronas reclináveis.</textarea>
+      </div>
+    </div>
+
+    <!-- Sugestão de preço por IA -->
+    <div class="sub-section-title mt-lg">🤖 Sugestão de preço ao cliente</div>
+    <div class="ai-panel">
+      <div class="ai-header">
+        <div class="ai-icon">🤖</div>
+        <div>
+          <div class="ai-title">Sugestão de valores por IA</div>
+          <div class="ai-sub">Baseado em 12 serviços similares (SP → Campos do Jordão, ~45 pax, incluindo serviço de bordo)</div>
+        </div>
+      </div>
+      <div class="ai-grid">
+        @for (opt of aiOptions; track opt.key) {
+          <div class="ai-option" [class.selected]="aiSelecionado() === opt.key" (click)="aiSelecionado.set(opt.key)">
+            <div class="ai-option-label">{{ opt.label }}</div>
+            <div class="ai-price" [class.destaque]="opt.destaque">{{ opt.preco }}</div>
+            <div class="ai-fin-row"><span class="ai-fin-label">Custo est. fornecedor</span><span class="ai-fin-val cost">{{ opt.custo }}</span></div>
+            <div class="ai-fin-row"><span class="ai-fin-label">Margem estimada</span><span class="ai-fin-val margin">{{ opt.margem }} <span class="ai-fin-pct">{{ opt.pct }}</span></span></div>
+            <div class="ai-option-note">{{ opt.nota }}</div>
+          </div>
+        }
+      </div>
+      <div class="ai-basis">📋 Referências: Serviços #278, #265, #241, #220, #198 e outros 7</div>
+    </div>
+
+    <!-- Prestadores -->
+    <div class="provider-section">
+      <div class="provider-section-title">
+        👤 Selecionar prestador
+        <span class="muted-inline">· margem calculada sobre preço recomendado (R$ 4.560)</span>
+      </div>
+      <div class="provider-list">
+        @for (p of providers; track p.nome; let i = $index) {
+          <div class="provider-item" [class.selected]="providerSelecionado() === i" [class.faded]="p.esmaecido" (click)="providerSelecionado.set(i)">
+            <div class="provider-avatar" [style.background]="p.bg">{{ p.inicial }}</div>
+            <div class="provider-main">
+              <div class="provider-name">
+                {{ p.nome }}
+                @if (p.indicacao) { <span class="referral-badge">👥 Indicação</span> }
+              </div>
+              <div class="provider-meta">
+                <span class="provider-stars">@for (on of estrelasArray(p.estrelas); track $index) { <span [class.off]="!on">★</span> }</span>
+                {{ p.meta }}
+              </div>
+              <div class="provider-tags">
+                @for (t of p.tags; track t.texto) {
+                  <span class="provider-tag" [style.background]="t.cor + '15'" [style.color]="t.cor" [style.border]="'1px solid ' + t.cor + '25'">{{ t.texto }}</span>
+                }
+              </div>
+            </div>
+            <div class="provider-fin">
+              <div class="fin-row-sm"><span class="fin-label-sm">Custo ao fornecedor</span><span class="fin-val-cost">{{ p.custo }}</span></div>
+              <div class="fin-row-sm"><span class="fin-label-sm">Preço ao cliente</span><span class="fin-val-price">{{ p.preco }}</span></div>
+              <div class="fin-row-sm"><span class="fin-label-sm">Margem bruta</span><span class="fin-val-margin">{{ p.margem }} <span class="fin-pct-badge">{{ p.margemPct }}</span></span></div>
+            </div>
+          </div>
+        }
+      </div>
+      <button class="add-provider-btn">+ Buscar outros prestadores para esta rota</button>
+    </div>
+
+    <!-- Resumo financeiro -->
+    <div class="finance-summary">
+      <div class="finance-summary-title">
+        💲 Resumo Financeiro da Proposta
+        <span class="muted-inline">EDSON selecionado · Preço Recomendado</span>
+      </div>
+      <div class="finance-summary-row">
+        <span class="finance-summary-label">Preço ao cliente (INSPER)</span>
+        <span class="finance-summary-val ok">R$ 4.560,00</span>
+      </div>
+      <div class="finance-summary-row">
+        <span class="finance-summary-label">Custo ao fornecedor (EDSON)</span>
+        <span class="finance-summary-val danger">− R$ 2.200,00</span>
+      </div>
+      <div class="finance-summary-row finance-total-row">
+        <span class="finance-summary-label">Margem bruta</span>
+        <span class="finance-summary-val">R$ 2.360,00</span>
+      </div>
+      <div class="margin-bar"><div class="margin-bar-fill" style="width:51.8%"></div></div>
+      <div class="margin-note">
+        <span class="margin-note-pct">51,8% de margem</span>
+        <span>Meta da empresa: ≥ 40% · ✅ Dentro da meta</span>
+      </div>
+    </div>
+
+    <div class="wizard-footer">
+      <a routerLink="/" class="btn-back">← Voltar</a>
+      <button class="btn-next">Próximo: Roteiro →</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,57 @@
+# =============================================================================
+#  Dockerfile.migrator  —  FleetExecutive.MigrationRunner (console app .NET 9.0)
+# -----------------------------------------------------------------------------
+#  Segue o MESMO padrão multi-stage do Dockerfile principal, mas para o tool
+#  que aplica as migrations do banco. A diferença conceitual importante:
+#
+#    - A API é um serviço que fica LIGADO o tempo todo, atendendo requisições.
+#    - O migrator é uma TAREFA: roda uma vez, aplica as migrations, e ENCERRA.
+#      No compose, a API só sobe depois que essa tarefa termina com sucesso.
+#
+#  OBS.: hoje o FleetExecutive.MigrationRunner ainda é um esqueleto (só escreve
+#  "Hello, World!"). Este Dockerfile já deixa tudo pronto para quando você
+#  implementar a aplicação real das migrations lá dentro.
+# =============================================================================
+
+
+# =============================================================================
+#  ESTÁGIO 1 — BUILD  (compila e publica o migrator)
+# =============================================================================
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+# Pasta de trabalho dentro do contêiner (nova e vazia; sem ligação com o host).
+WORKDIR /app
+
+# Copiamos os .csproj primeiro para aproveitar o cache do restore — mesma
+# estratégia do Dockerfile da API. Precisamos de todos os projetos que o
+# migrator referencia (direta ou indiretamente): Infrastructure e Application
+# puxam Domain e Shared.
+COPY FleetExecutive.sln .
+COPY tools/FleetExecutive.MigrationRunner/FleetExecutive.MigrationRunner.csproj  tools/FleetExecutive.MigrationRunner/
+COPY src/FleetExecutive.Application/FleetExecutive.Application.csproj             src/FleetExecutive.Application/
+COPY src/FleetExecutive.Infrastructure/FleetExecutive.Infrastructure.csproj      src/FleetExecutive.Infrastructure/
+COPY src/FleetExecutive.Domain/FleetExecutive.Domain.csproj                      src/FleetExecutive.Domain/
+COPY src/FleetExecutive.Shared/FleetExecutive.Shared.csproj                      src/FleetExecutive.Shared/
+
+RUN dotnet restore tools/FleetExecutive.MigrationRunner/FleetExecutive.MigrationRunner.csproj
+
+# Copia o resto do código e publica em Release.
+COPY . .
+RUN dotnet publish tools/FleetExecutive.MigrationRunner/FleetExecutive.MigrationRunner.csproj -c Release -o /app/publish --no-restore
+
+
+# =============================================================================
+#  ESTÁGIO 2 — FINAL  (imagem enxuta que roda a tarefa)
+# -----------------------------------------------------------------------------
+#  Aqui usamos "dotnet/runtime" (runtime de CONSOLE), e não "dotnet/aspnet".
+#  O migrator não é um site: não precisa do servidor web ASP.NET, então essa
+#  imagem é ainda mais leve. Use aspnet para APIs; runtime para apps de console.
+# =============================================================================
+FROM mcr.microsoft.com/dotnet/runtime:9.0 AS final
+WORKDIR /app
+
+COPY --from=build /app/publish .
+
+# Ao iniciar o contêiner, executa o migrator. Ele roda, faz o trabalho e sai —
+# não fica "escutando" nada. O código de saída (0 = sucesso) é o que o compose
+# observa para liberar a subida da API.
+ENTRYPOINT ["dotnet", "FleetExecutive.MigrationRunner.dll"]

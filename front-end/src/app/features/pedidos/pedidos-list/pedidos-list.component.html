@@ -1,0 +1,68 @@
+<div class="toolbar">
+  <a routerLink="/orcamentos/novo"><button class="btn-primary">+ Novo pedido</button></a>
+  <div class="search-bar">
+    <input
+      type="text"
+      placeholder="🔍 Buscar por origem ou nº do pedido…"
+      [value]="termo()"
+      (input)="termo.set($any($event.target).value)"
+    />
+  </div>
+  <div class="toolbar-right">
+    <button class="btn-ghost" (click)="load()">⟳ Atualizar</button>
+    <button class="btn-ghost">⌄ Exportar</button>
+  </div>
+</div>
+
+<div class="stat-cards">
+  <div class="stat-card">
+    <div><div class="stat-val">{{ total() }}</div><div class="stat-lbl">Total de pedidos</div></div>
+    <div class="stat-icon" style="background:#3b82f620;color:#2563eb">📋</div>
+  </div>
+  <div class="stat-card">
+    <div><div class="stat-val">{{ faturamentoTotal | currency:'BRL':'symbol':'1.0-0' }}</div><div class="stat-lbl">Faturamento (página)</div></div>
+    <div class="stat-icon" style="background:#10b98120;color:#059669">$</div>
+  </div>
+  <div class="stat-card">
+    <div><div class="stat-val">{{ ticketMedio | currency:'BRL':'symbol':'1.0-0' }}</div><div class="stat-lbl">Ticket médio</div></div>
+    <div class="stat-icon" style="background:#10b98120;color:#059669">📈</div>
+  </div>
+  <div class="stat-card">
+    <div><div class="stat-val">4,8 <span class="nps-mini">★</span></div><div class="stat-lbl">NPS médio do mês</div></div>
+    <div class="stat-icon" style="background:#f59e0b20;color:#d97706">⭐</div>
+  </div>
+</div>
+
+<div class="card table-card">
+  @if (loading()) {
+    <div class="state-msg"><span class="spinner"></span> Carregando pedidos…</div>
+  } @else if (error()) {
+    <div class="state-msg">
+      Não foi possível carregar os pedidos.
+      <button class="btn-ghost" (click)="load()">Tentar novamente</button>
+    </div>
+  } @else if (filtrados().length === 0) {
+    <div class="state-msg">Nenhum pedido encontrado.</div>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th><th>Origem</th><th>Status comercial</th>
+          <th>Status operacional</th><th>Criado em</th><th>Valor Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (p of filtrados(); track p.id) {
+          <tr>
+            <td><a [routerLink]="['/pedidos', p.id]" class="id-link">#{{ p.id.slice(0, 8) }}</a></td>
+            <td>{{ p.origem }}</td>
+            <td><span class="badge" [class]="badge(p.statusComercial).css">{{ badge(p.statusComercial).label }}</span></td>
+            <td class="text-muted">{{ p.statusOperacional }}</td>
+            <td>{{ p.createdAt | date:'dd/MM/yyyy' }}</td>
+            <td class="text-strong">{{ p.valorTotal | currency:'BRL':'symbol':'1.2-2' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>

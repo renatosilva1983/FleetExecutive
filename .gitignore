@@ -1,14 +1,14 @@
 # .NET
-backend/**/bin/
-backend/**/obj/
+/back-end/**/bin/
+/back-end/**/obj/
 *.user
 
 # Node / Nx
-frontend/node_modules/
-frontend/dist/
-frontend/.nx/cache/
-frontend/.nx/workspace-data/
-frontend/.angular/
+/front-end/node_modules/
+/front-end/dist/
+/front-end/.nx/cache/
+/front-end/.nx/workspace-data/
+/front-end/.angular/
 
 # Editor / OS
 .vs/
@@ -19,28 +19,10 @@ Thumbs.db
 
 # Env / secrets
 *.env.local
+# Self-hosted GitHub Actions runner (contém credenciais e a pasta _work)
+/back-end/actions-runner/
 /back-end/.claude
-/back-end/src/FleetExecutive.Api/bin/Debug/net9.0
 /front-end/.claude
-/back-end/tests/FleetExecutive.Api.IntegrationTests/bin/Debug/net9.0
-/back-end/tests/FleetExecutive.Api.IntegrationTests/obj
-/back-end/tests/FleetExecutive.Application.Tests/bin/Debug/net9.0
-/back-end/tests/FleetExecutive.Application.Tests/obj
-/back-end/tests/FleetExecutive.Architecture.Tests/bin/Debug/net9.0
-/back-end/tests/FleetExecutive.Architecture.Tests/obj
-/back-end/tests/FleetExecutive.Domain.Tests/bin/Debug/net9.0
-/back-end/tests/FleetExecutive.Domain.Tests/obj
-/back-end/tests/FleetExecutive.Infrastructure.Tests/bin/Debug/net9.0
-/back-end/tests/FleetExecutive.Infrastructure.Tests/obj
-/back-end/tools/FleetExecutive.MigrationRunner/bin/Debug/net9.0
-/back-end/tools/FleetExecutive.MigrationRunner/obj
-/back-end/src/FleetExecutive.Shared/obj
-/back-end/src/FleetExecutive.Shared/bin/Debug/net9.0
+
+# Arquivo default gerado pelo template (não faz parte do projeto)
 /back-end/src/FleetExecutive.Shared/Class1.cs
-/back-end/src/FleetExecutive.Infrastructure/bin/Debug/net9.0
-/back-end/src/FleetExecutive.Infrastructure/obj
-/back-end/src/FleetExecutive.Domain/bin/Debug/net9.0
-/back-end/src/FleetExecutive.Domain/obj
-/back-end/src/FleetExecutive.Application/bin/Debug/net9.0
-/back-end/src/FleetExecutive.Application/obj
-/back-end/src/FleetExecutive.Api/obj

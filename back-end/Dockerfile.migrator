@@ -42,11 +42,14 @@ RUN dotnet publish tools/FleetExecutive.MigrationRunner/FleetExecutive.Migration
 # =============================================================================
 #  ESTÁGIO 2 — FINAL  (imagem enxuta que roda a tarefa)
 # -----------------------------------------------------------------------------
-#  Aqui usamos "dotnet/runtime" (runtime de CONSOLE), e não "dotnet/aspnet".
-#  O migrator não é um site: não precisa do servidor web ASP.NET, então essa
-#  imagem é ainda mais leve. Use aspnet para APIs; runtime para apps de console.
+#  Embora o migrator seja um app de CONSOLE, ele depende (via Infrastructure ->
+#  Finbuckle.MultiTenant.AspNetCore) do framework compartilhado do ASP.NET Core.
+#  Por isso NÃO dá para usar "dotnet/runtime" aqui: essa imagem só traz o
+#  Microsoft.NETCore.App e o app falha com "No frameworks were found" (exit 150),
+#  porque precisa também do Microsoft.AspNetCore.App. A imagem "dotnet/aspnet"
+#  inclui os dois frameworks e resolve isso.
 # =============================================================================
-FROM mcr.microsoft.com/dotnet/runtime:9.0 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app
 
 COPY --from=build /app/publish .

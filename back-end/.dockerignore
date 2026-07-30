@@ -21,3 +21,7 @@ Dockerfile
 # Configurações locais que não devem entrar na imagem
 **/appsettings.Development.json
 **/*.user
+
+# Self-hosted GitHub Actions runner — NUNCA vai para o contexto de build.
+# Contém credenciais (.credentials, chave RSA) e a pasta _work (pesada).
+actions-runner/

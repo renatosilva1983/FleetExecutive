@@ -44,3 +44,6 @@ Thumbs.db
 /back-end/src/FleetExecutive.Application/bin/Debug/net9.0
 /back-end/src/FleetExecutive.Application/obj
 /back-end/src/FleetExecutive.Api/obj
+/back-end/src/FleetExecutive.Application/bin/Release/net9.0
+/back-end/src/FleetExecutive.Domain/bin/Release/net9.0
+/back-end/src/FleetExecutive.Shared/bin/Release/net9.0

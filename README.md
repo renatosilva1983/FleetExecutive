@@ -1,4 +1,4 @@
-# Bessa Sistema
+# FleetExecutive Sistema
 
 Monorepo do sistema real da Bessa Transportes (substitui o Fretatech). Ver a documentação de
 planejamento completa em `C:\Projetos\Bessa\Estrutura\` (arquivos `01` a `13` + `ESTRUTURA-PROJETO.md`)

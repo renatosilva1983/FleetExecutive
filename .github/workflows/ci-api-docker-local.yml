@@ -52,7 +52,7 @@ jobs:
       #  vazar usuário/senha do banco nos logs do GitHub.
       # -----------------------------------------------------------------------
       - name: Verificar a connection string do host
-        shell: pwsh
+        shell: powershell
         run: |
           if ([string]::IsNullOrWhiteSpace($env:StrCon_UserPost18)) {
             Write-Error "StrCon_UserPost18 nao esta visivel para o runner. Defina-a e REINICIE o runner (as variaveis de ambiente sao herdadas na inicializacao do processo)."

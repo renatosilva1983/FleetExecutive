@@ -1,0 +1,72 @@
+# =============================================================================
+#  ci-docker-local.yml — CI que constrói a imagem Docker da API na SUA máquina
+# -----------------------------------------------------------------------------
+#  Este workflow roda num self-hosted runner (seu PC) toda vez que houver um
+#  push na branch spr01/api/deploy-local, e faz o "docker build" da API.
+# =============================================================================
+
+# "name" é só o rótulo que aparece na aba Actions do GitHub.
+name: CI API Docker Local
+
+# -----------------------------------------------------------------------------
+#  "on" define o GATILHO: quando este workflow deve rodar.
+#  Aqui: a cada push, MAS só se for na branch spr01/api/deploy-local.
+# -----------------------------------------------------------------------------
+on:
+  push:
+    branches:
+      - spr01/api/deploy-local   # <── só esta branch dispara o workflow
+
+# -----------------------------------------------------------------------------
+#  "jobs" são os blocos de trabalho. Temos um só: "build".
+# -----------------------------------------------------------------------------
+jobs:
+  build:
+    # "runs-on" escolhe QUAL máquina executa o job, pelas LABELS do runner.
+    # "self-hosted" garante que rode no SEU runner (instalado no Passo A), e
+    # não numa máquina da nuvem do GitHub.
+    runs-on: self-hosted
+
+    steps:
+      # -----------------------------------------------------------------------
+      #  Passo 1: baixar o código da branch para dentro do runner.
+      #  "actions/checkout" é uma action oficial que faz o "git clone/checkout"
+      #  do commit que disparou o workflow. Sem isso, o runner não teria os
+      #  arquivos do projeto.
+      # -----------------------------------------------------------------------
+      - name: Baixar o código (checkout)
+        uses: actions/checkout@v4
+
+      # -----------------------------------------------------------------------
+      #  Passo 2 (diagnóstico): provar que o Docker está acessível no runner.
+      #  Se este passo falhar, o problema é o ambiente (Docker Desktop fechado),
+      #  não o seu workflow.
+      # -----------------------------------------------------------------------
+      - name: Verificar o Docker
+        run: docker version
+
+      # -----------------------------------------------------------------------
+      #  Passo 3: construir a imagem da API.
+      #  Lembre da estrutura de pastas: o Dockerfile está em back-end/.
+      #    -f back-end/Dockerfile   -> caminho do Dockerfile
+      #    -t fleetexecutive-api... -> "tag" (nome) da imagem
+      #    back-end                 -> o "contexto" do build (a pasta que o
+      #                                Docker enxerga; os COPY do Dockerfile
+      #                                são relativos a ela)
+      #  Usamos ${{ github.sha }} para marcar a imagem com o hash do commit,
+      #  além da tag "local" fixa, mais fácil de lembrar.
+      # -----------------------------------------------------------------------
+      - name: Build da imagem da API
+        run: >
+          docker build
+          -f back-end/Dockerfile
+          -t fleetexecutive-api:local
+          -t fleetexecutive-api:${{ github.sha }}
+          back-end
+
+      # -----------------------------------------------------------------------
+      #  Passo 4 (opcional, didático): listar as imagens para PROVAR que ela
+      #  foi criada e ficou na sua máquina.
+      # -----------------------------------------------------------------------
+      - name: Confirmar a imagem criada
+        run: docker images fleetexecutive-api

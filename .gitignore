@@ -47,3 +47,11 @@ Thumbs.db
 /back-end/src/FleetExecutive.Application/bin/Release/net9.0
 /back-end/src/FleetExecutive.Domain/bin/Release/net9.0
 /back-end/src/FleetExecutive.Shared/bin/Release/net9.0
+/back-end/src/FleetExecutive.Api/bin/Release/net9.0
+/back-end/src/FleetExecutive.Infrastructure/bin/Release/net9.0
+/back-end/tests/FleetExecutive.Api.IntegrationTests/bin/Release/net9.0
+/back-end/tests/FleetExecutive.Application.Tests/bin/Release/net9.0
+/back-end/tests/FleetExecutive.Architecture.Tests/bin/Release/net9.0
+/back-end/tests/FleetExecutive.Domain.Tests/bin/Release/net9.0
+/back-end/tests/FleetExecutive.Infrastructure.Tests/bin/Release/net9.0
+/back-end/tools/FleetExecutive.MigrationRunner/bin/Release/net9.0

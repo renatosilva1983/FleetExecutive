@@ -1,72 +1,88 @@
 # =============================================================================
-#  ci-docker-local.yml — CI que constrói a imagem Docker da API na SUA máquina
+#  ci-api-docker-local.yml — CI que SOBE a API conectada ao banco LOCAL
 # -----------------------------------------------------------------------------
-#  Este workflow roda num self-hosted runner (seu PC) toda vez que houver um
-#  push na branch spr01/api/deploy-local, e faz o "docker build" da API.
+#  Antes este workflow só fazia "docker build" (empacotava a imagem, mas não
+#  rodava nada — por isso não "enxergava" o banco). Agora ele usa o
+#  docker-compose.yml de back-end/, que:
+#    1) constrói a imagem (--build),
+#    2) sobe o migrator (aplica as migrations no seu Postgres LOCAL e encerra),
+#    3) sobe a API já conectada a esse banco, via a variável StrCon_UserPost18
+#       com o Host trocado para host.docker.internal.
+#
+#  Roda num self-hosted runner (seu PC) a cada push na branch
+#  spr01/api/deploy-local.
 # =============================================================================
 
-# "name" é só o rótulo que aparece na aba Actions do GitHub.
 name: CI API Docker Local
 
-# -----------------------------------------------------------------------------
-#  "on" define o GATILHO: quando este workflow deve rodar.
-#  Aqui: a cada push, MAS só se for na branch spr01/api/deploy-local.
-# -----------------------------------------------------------------------------
 on:
+  workflow_dispatch:
   push:
     branches:
       - spr01/api/deploy-local   # <── só esta branch dispara o workflow
 
-# -----------------------------------------------------------------------------
-#  "jobs" são os blocos de trabalho. Temos um só: "build".
-# -----------------------------------------------------------------------------
 jobs:
   build:
-    # "runs-on" escolhe QUAL máquina executa o job, pelas LABELS do runner.
-    # "self-hosted" garante que rode no SEU runner (instalado no Passo A), e
-    # não numa máquina da nuvem do GitHub.
     runs-on: self-hosted
+
+    # Todos os passos "run" rodam a partir de back-end/, onde ficam o
+    # docker-compose.yml e os Dockerfiles. Assim o "docker compose" acha o
+    # arquivo sozinho, e o context "." do compose aponta para esta pasta.
+    defaults:
+      run:
+        working-directory: back-end
 
     steps:
       # -----------------------------------------------------------------------
       #  Passo 1: baixar o código da branch para dentro do runner.
-      #  "actions/checkout" é uma action oficial que faz o "git clone/checkout"
-      #  do commit que disparou o workflow. Sem isso, o runner não teria os
-      #  arquivos do projeto.
       # -----------------------------------------------------------------------
       - name: Baixar o código (checkout)
         uses: actions/checkout@v4
 
       # -----------------------------------------------------------------------
       #  Passo 2 (diagnóstico): provar que o Docker está acessível no runner.
-      #  Se este passo falhar, o problema é o ambiente (Docker Desktop fechado),
-      #  não o seu workflow.
       # -----------------------------------------------------------------------
       - name: Verificar o Docker
         run: docker version
 
       # -----------------------------------------------------------------------
-      #  Passo 3: construir a imagem da API.
-      #  Lembre da estrutura de pastas: o Dockerfile está em back-end/.
-      #    -f back-end/Dockerfile   -> caminho do Dockerfile
-      #    -t fleetexecutive-api... -> "tag" (nome) da imagem
-      #    back-end                 -> o "contexto" do build (a pasta que o
-      #                                Docker enxerga; os COPY do Dockerfile
-      #                                são relativos a ela)
-      #  Usamos ${{ github.sha }} para marcar a imagem com o hash do commit,
-      #  além da tag "local" fixa, mais fácil de lembrar.
+      #  Passo 3 (diagnóstico): a causa nº 1 de "não enxerga o banco" é a
+      #  variável StrCon_UserPost18 NÃO estar visível para o processo do runner.
+      #  Aqui só confirmamos que ela EXISTE — sem imprimir o valor, para não
+      #  vazar usuário/senha do banco nos logs do GitHub.
       # -----------------------------------------------------------------------
-      - name: Build da imagem da API
-        run: >
-          docker build
-          -f back-end/Dockerfile
-          -t fleetexecutive-api:local
-          -t fleetexecutive-api:${{ github.sha }}
-          back-end
+      - name: Verificar a connection string do host
+        shell: pwsh
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:StrCon_UserPost18)) {
+            Write-Error "StrCon_UserPost18 nao esta visivel para o runner. Defina-a e REINICIE o runner (as variaveis de ambiente sao herdadas na inicializacao do processo)."
+            exit 1
+          }
+          Write-Host "OK: StrCon_UserPost18 esta definida (valor omitido de proposito)."
 
       # -----------------------------------------------------------------------
-      #  Passo 4 (opcional, didático): listar as imagens para PROVAR que ela
-      #  foi criada e ficou na sua máquina.
+      #  Passo 4 (limpeza): derruba uma execução anterior, se existir, para
+      #  começar do zero. continue-on-error: no 1º run não há nada para derrubar.
       # -----------------------------------------------------------------------
-      - name: Confirmar a imagem criada
-        run: docker images fleetexecutive-api
+      - name: Derrubar execução anterior (se houver)
+        continue-on-error: true
+        run: docker compose down --remove-orphans
+
+      # -----------------------------------------------------------------------
+      #  Passo 5: construir e SUBIR. É aqui que a API passa a rodar conectada
+      #  ao banco local.
+      #    up        -> cria/inicia os contêineres
+      #    -d        -> "detached": não trava o job; devolve o controle após
+      #                 o migrator concluir e a API iniciar (por causa do
+      #                 depends_on service_completed_successfully do compose)
+      #    --build   -> reconstrói a imagem com o código deste push
+      # -----------------------------------------------------------------------
+      - name: Subir a API conectada ao banco local (compose up)
+        run: docker compose up -d --build
+
+      # -----------------------------------------------------------------------
+      #  Passo 6 (prova): mostrar o estado dos contêineres. A API deve aparecer
+      #  como "running"/"Up"; o migrator como "exited (0)".
+      # -----------------------------------------------------------------------
+      - name: Confirmar contêineres no ar
+        run: docker compose ps -a

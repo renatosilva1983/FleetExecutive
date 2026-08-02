@@ -16,7 +16,7 @@ public class VehicleConfiguration : IEntityTypeConfiguration<Vehicle>
         builder.Property(v => v.NumeroOrdem).HasMaxLength(20).IsRequired();
         builder.Property(v => v.Placa).HasMaxLength(10).IsRequired();
         builder.HasIndex(v => v.Placa).IsUnique();
-        builder.Property(v => v.Status).HasConversion<string>().HasMaxLength(20);
+        // Status: enum virou FK para tabela-catálogo (ver EnumLookupRegistry).
 
         // Features: mesma técnica de Customer.Tags — coleção guardada como JSON via campo privado.
         builder.Property<List<VehicleFeature>>("_features")

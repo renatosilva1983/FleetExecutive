@@ -11,6 +11,6 @@ public class DriverLanguageConfiguration : IEntityTypeConfiguration<DriverLangua
         builder.ToTable("driver_languages");
         builder.HasKey(l => l.Id);
         builder.Property(l => l.Idioma).HasMaxLength(60).IsRequired();
-        builder.Property(l => l.Nivel).HasConversion<string>().HasMaxLength(20);
+        // Nivel: enum virou FK para tabela-catálogo (ver EnumLookupRegistry).
     }
 }

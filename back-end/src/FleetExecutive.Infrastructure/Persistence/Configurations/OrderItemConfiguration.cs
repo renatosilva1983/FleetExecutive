@@ -10,7 +10,7 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
     {
         builder.ToTable("order_items");
         builder.HasKey(i => i.Id);
-        builder.Property(i => i.Tipo).HasConversion<string>().HasMaxLength(30);
+        // Tipo (SubtipoServico): enum virou FK para tabela-catálogo (ver EnumLookupRegistry).
         builder.Property(i => i.Origem).HasMaxLength(200).IsRequired();
         builder.Property(i => i.Destino).HasMaxLength(200).IsRequired();
         builder.Property(i => i.ValorServico).HasColumnType("numeric(12,2)");

@@ -10,9 +10,7 @@ public class CommissionConfiguration : IEntityTypeConfiguration<Commission>
     {
         builder.ToTable("commissions");
         builder.HasKey(c => c.Id);
-        builder.Property(c => c.Tipo).HasConversion<string>().HasMaxLength(20);
-        builder.Property(c => c.RecebedorTipo).HasConversion<string>().HasMaxLength(20);
-        builder.Property(c => c.Status).HasConversion<string>().HasMaxLength(20);
+        // Tipo / RecebedorTipo / Status: enums viraram FK para tabela-catálogo (ver EnumLookupRegistry).
         builder.Property(c => c.Percentual).HasColumnType("numeric(5,2)");
         builder.Property(c => c.Valor).HasColumnType("numeric(12,2)");
         builder.HasIndex(c => c.OrderItemId);

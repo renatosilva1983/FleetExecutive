@@ -10,7 +10,7 @@ public class CustomerAddressConfiguration : IEntityTypeConfiguration<CustomerAdd
     {
         builder.ToTable("customer_addresses");
         builder.HasKey(a => a.Id);
-        builder.Property(a => a.Tipo).HasConversion<string>().HasMaxLength(20);
+        // Tipo: enum virou FK para tabela-catálogo (ver EnumLookupRegistry).
         builder.Property(a => a.Rua).HasMaxLength(300).IsRequired();
         builder.Property(a => a.Cidade).HasMaxLength(150).IsRequired();
         builder.Property(a => a.Uf).HasMaxLength(2).IsRequired();

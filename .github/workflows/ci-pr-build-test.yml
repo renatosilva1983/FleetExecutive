@@ -1,0 +1,78 @@
+# =============================================================================
+#  ci-pr-build-test.yml — "PR gate": valida um Pull Request e, se passar, faz o
+#  merge automaticamente.
+# -----------------------------------------------------------------------------
+#  Fluxo ao abrir/atualizar um PR mirando a branch protegida:
+#    1) checkout do código do PR
+#    2) dotnet restore
+#    3) dotnet build
+#    4) dotnet test
+#  Só se as 4 fases passarem, o último passo faz o merge do PR.
+#
+#  IMPORTANTE (para o merge automático funcionar):
+#   - A branch protegida deve BLOQUEAR push direto e exigir PR (ver instruções
+#     que acompanham este arquivo).
+#   - NÃO marque este workflow como "required status check" na proteção de
+#     branch: ele mesmo é quem faz o merge, então exigir o próprio check criaria
+#     um impasse (o check nunca fica verde antes do merge).
+# =============================================================================
+
+name: CI PR - Build e Test
+
+on:
+  pull_request:
+    branches:
+      - spr01/api/deploy-local   # <── ajuste para a SUA branch protegida
+
+# O GITHUB_TOKEN precisa de escrita para conseguir dar merge no PR.
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  build-test:
+    runs-on: self-hosted
+
+    # Os comandos dotnet rodam a partir de back-end/, onde está a solution.
+    defaults:
+      run:
+        working-directory: back-end
+
+    steps:
+      # 1) Baixar o código do PR (o checkout já traz o resultado do merge do PR).
+      - name: Baixar o código (checkout)
+        uses: actions/checkout@v4
+
+      # 2) Restaurar dependências.
+      - name: Restore
+        run: dotnet restore FleetExecutive.sln
+
+      # 3) Compilar em Release, sem restaurar de novo.
+      - name: Build
+        run: dotnet build FleetExecutive.sln -c Release --no-restore
+
+      # 4) Rodar toda a suíte de testes (usa o build anterior).
+      - name: Test
+        run: dotnet test FleetExecutive.sln -c Release --no-build --verbosity normal
+
+      # 5) Merge automático — só é alcançado se os passos acima passaram
+      #    (um passo que falha aborta o job antes de chegar aqui).
+      #    Usamos github-script (Octokit embutido) para não depender do gh CLI,
+      #    que não está instalado no runner.
+      #
+      #    github-token: usamos um PAT (secret PAT_MERGE) em vez do GITHUB_TOKEN.
+      #    Motivo: um merge feito pelo GITHUB_TOKEN NÃO dispara outros workflows
+      #    (proteção contra loops); com o PAT, o push do merge conta como ação de
+      #    usuário real e ACIONA o workflow de deploy (ci-api-docker-local.yml).
+      - name: Merge automático do PR
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.PAT_MERGE }}
+          script: |
+            await github.rest.pulls.merge({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              merge_method: 'merge',   // 'merge' | 'squash' | 'rebase'
+            });
+            core.info('✔ Build e testes OK — PR mergeado automaticamente.');

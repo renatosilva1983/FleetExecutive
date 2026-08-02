@@ -129,3 +129,8 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+// Torna a classe Program acessível para o WebApplicationFactory<Program> usado nos testes de
+// integração (FleetExecutive.Api.IntegrationTests). Com top-level statements, o Program gerado é
+// internal — este partial público apenas expõe o ponto de entrada para a hospedagem em memória.
+public partial class Program;

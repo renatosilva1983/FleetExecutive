@@ -8,9 +8,9 @@
 #    - O migrator é uma TAREFA: roda uma vez, aplica as migrations, e ENCERRA.
 #      No compose, a API só sobe depois que essa tarefa termina com sucesso.
 #
-#  OBS.: hoje o FleetExecutive.MigrationRunner ainda é um esqueleto (só escreve
-#  "Hello, World!"). Este Dockerfile já deixa tudo pronto para quando você
-#  implementar a aplicação real das migrations lá dentro.
+#  O FleetExecutive.MigrationRunner migra o banco MASTER e, em seguida, o banco
+#  de cada tenant cadastrado (database-per-tenant). Sai com código 0 em sucesso
+#  ou != 0 se algo falhar — o que impede a API de subir.
 # =============================================================================
 
 

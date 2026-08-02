@@ -10,7 +10,7 @@ public class DriverDocumentConfiguration : IEntityTypeConfiguration<DriverDocume
     {
         builder.ToTable("driver_documents");
         builder.HasKey(d => d.Id);
-        builder.Property(d => d.Tipo).HasConversion<string>().HasMaxLength(20);
+        // Tipo: enum virou FK para tabela-catálogo (ver EnumLookupRegistry).
         builder.Property(d => d.Categoria).HasMaxLength(10);
         builder.Property(d => d.Numero).HasMaxLength(60);
         // "Status" é calculado em runtime a partir de ValidoAte (ver DriverDocument.Status) — não é coluna.

@@ -60,10 +60,8 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                     b.Property<string>("Telefone")
                         .HasColumnType("text");
 
-                    b.Property<string>("Tipo")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                    b.Property<int>("Tipo")
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -83,6 +81,8 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                     b.HasIndex("Email");
 
                     b.HasIndex("Nome");
+
+                    b.HasIndex("Tipo");
 
                     b.ToTable("customers", (string)null);
                 });
@@ -119,10 +119,8 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                         .HasMaxLength(300)
                         .HasColumnType("character varying(300)");
 
-                    b.Property<string>("Tipo")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                    b.Property<int>("Tipo")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Uf")
                         .IsRequired()
@@ -138,6 +136,8 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
+
+                    b.HasIndex("Tipo");
 
                     b.ToTable("customer_addresses", (string)null);
                 });
@@ -160,23 +160,17 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Origem")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                    b.Property<int>("Origem")
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset?>("PagoEm")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
-                    b.Property<string>("Tipo")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                    b.Property<int>("Tipo")
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -194,7 +188,11 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
 
                     b.HasIndex("OrderId");
 
+                    b.HasIndex("Origem");
+
                     b.HasIndex("Status");
+
+                    b.HasIndex("Tipo");
 
                     b.ToTable("charges", (string)null);
                 });
@@ -229,20 +227,14 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                     b.Property<Guid>("RecebedorId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("RecebedorTipo")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                    b.Property<int>("RecebedorTipo")
+                        .HasColumnType("integer");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
-                    b.Property<string>("Tipo")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                    b.Property<int>("Tipo")
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -256,6 +248,10 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                     b.HasKey("Id");
 
                     b.HasIndex("OrderItemId");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("Tipo");
 
                     b.HasIndex("RecebedorTipo", "RecebedorId");
 
@@ -280,10 +276,8 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -295,6 +289,8 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
 
                     b.HasIndex("OrderId")
                         .IsUnique();
+
+                    b.HasIndex("Status");
 
                     b.ToTable("invoices", (string)null);
                 });
@@ -323,15 +319,11 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                     b.Property<string>("MotivoPerda")
                         .HasColumnType("text");
 
-                    b.Property<string>("Origem")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                    b.Property<int>("Origem")
+                        .HasColumnType("integer");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -345,6 +337,8 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
+
+                    b.HasIndex("Origem");
 
                     b.HasIndex("Status");
 
@@ -397,19 +391,14 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                     b.Property<Guid>("QuoteId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Subtipo")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
+                    b.Property<int>("Subtipo")
+                        .HasColumnType("integer");
 
-                    b.Property<string>("TipoServico")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
+                    b.Property<int>("TipoServico")
+                        .HasColumnType("integer");
 
-                    b.Property<string>("TipoVeiculoPreferido")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                    b.Property<int?>("TipoVeiculoPreferido")
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -425,6 +414,12 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                     b.HasKey("Id");
 
                     b.HasIndex("QuoteId");
+
+                    b.HasIndex("Subtipo");
+
+                    b.HasIndex("TipoServico");
+
+                    b.HasIndex("TipoVeiculoPreferido");
 
                     b.ToTable("quote_services", (string)null);
                 });
@@ -459,23 +454,17 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                     b.Property<string>("MotivoCancelamento")
                         .HasColumnType("text");
 
-                    b.Property<string>("Origem")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                    b.Property<int>("Origem")
+                        .HasColumnType("integer");
 
                     b.Property<Guid?>("QuoteId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("StatusComercial")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                    b.Property<int>("StatusComercial")
+                        .HasColumnType("integer");
 
-                    b.Property<string>("StatusOperacional")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                    b.Property<int>("StatusOperacional")
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -490,10 +479,14 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
 
                     b.HasIndex("CustomerId");
 
+                    b.HasIndex("Origem");
+
                     b.HasIndex("QuoteId")
                         .IsUnique();
 
                     b.HasIndex("StatusComercial");
+
+                    b.HasIndex("StatusOperacional");
 
                     b.ToTable("orders", (string)null);
                 });
@@ -604,10 +597,8 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<string>("Tipo")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
+                    b.Property<int>("Tipo")
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -627,6 +618,8 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                         .IsUnique();
 
                     b.HasIndex("OrderId");
+
+                    b.HasIndex("Tipo");
 
                     b.ToTable("order_items", (string)null);
                 });
@@ -666,10 +659,8 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                     b.Property<string>("Telefone")
                         .HasColumnType("text");
 
-                    b.Property<string>("Tipo")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
+                    b.Property<int>("Tipo")
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -687,6 +678,8 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                     b.HasIndex("Nome");
 
                     b.HasIndex("Referencia");
+
+                    b.HasIndex("Tipo");
 
                     b.ToTable("drivers", (string)null);
                 });
@@ -714,10 +707,8 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                         .HasMaxLength(60)
                         .HasColumnType("character varying(60)");
 
-                    b.Property<string>("Tipo")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                    b.Property<int>("Tipo")
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -731,6 +722,8 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                     b.HasKey("Id");
 
                     b.HasIndex("DriverId");
+
+                    b.HasIndex("Tipo");
 
                     b.ToTable("driver_documents", (string)null);
                 });
@@ -755,10 +748,8 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                         .HasMaxLength(60)
                         .HasColumnType("character varying(60)");
 
-                    b.Property<string>("Nivel")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                    b.Property<int>("Nivel")
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -769,6 +760,8 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                     b.HasKey("Id");
 
                     b.HasIndex("DriverId");
+
+                    b.HasIndex("Nivel");
 
                     b.ToTable("driver_languages", (string)null);
                 });
@@ -791,18 +784,14 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                     b.Property<DateTimeOffset?>("Prazo")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Prioridade")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                    b.Property<int>("Prioridade")
+                        .HasColumnType("integer");
 
                     b.Property<Guid?>("ResponsavelId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Titulo")
                         .IsRequired()
@@ -818,11 +807,12 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                     b.Property<Guid?>("VinculoId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("VinculoTipo")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                    b.Property<int?>("VinculoTipo")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Prioridade");
 
                     b.HasIndex("ResponsavelId");
 
@@ -903,10 +893,8 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<string>("Perfil")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
+                    b.Property<int>("Perfil")
+                        .HasColumnType("integer");
 
                     b.Property<string>("SenhaHash")
                         .IsRequired()
@@ -928,6 +916,8 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
 
                     b.HasIndex("Email")
                         .IsUnique();
+
+                    b.HasIndex("Perfil");
 
                     b.ToTable("users", (string)null);
                 });
@@ -983,10 +973,8 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                     b.Property<int>("Capacidade")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Categoria")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                    b.Property<int>("Categoria")
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -1012,10 +1000,8 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                     b.Property<bool>("TemWifi")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("Tipo")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                    b.Property<int>("Tipo")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Titulo")
                         .IsRequired()
@@ -1029,6 +1015,10 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Categoria");
+
+                    b.HasIndex("Tipo");
 
                     b.ToTable("fleets", (string)null);
                 });
@@ -1117,10 +1107,8 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -1142,7 +1130,393 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                     b.HasIndex("Placa")
                         .IsUnique();
 
+                    b.HasIndex("Status");
+
                     b.ToTable("vehicles", (string)null);
+                });
+
+            modelBuilder.Entity("FleetExecutive.Infrastructure.Persistence.Lookups.CategoriaVeiculoLookup", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("categoria_veiculo", (string)null);
+                });
+
+            modelBuilder.Entity("FleetExecutive.Infrastructure.Persistence.Lookups.NivelIdiomaLookup", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("nivel_idioma", (string)null);
+                });
+
+            modelBuilder.Entity("FleetExecutive.Infrastructure.Persistence.Lookups.OrigemCobrancaLookup", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("origem_cobranca", (string)null);
+                });
+
+            modelBuilder.Entity("FleetExecutive.Infrastructure.Persistence.Lookups.OrigemOrcamentoLookup", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("origem_orcamento", (string)null);
+                });
+
+            modelBuilder.Entity("FleetExecutive.Infrastructure.Persistence.Lookups.PerfilLookup", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("perfil", (string)null);
+                });
+
+            modelBuilder.Entity("FleetExecutive.Infrastructure.Persistence.Lookups.PrioridadeTarefaLookup", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("prioridade_tarefa", (string)null);
+                });
+
+            modelBuilder.Entity("FleetExecutive.Infrastructure.Persistence.Lookups.StatusCobrancaLookup", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("status_cobranca", (string)null);
+                });
+
+            modelBuilder.Entity("FleetExecutive.Infrastructure.Persistence.Lookups.StatusComercialLookup", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("status_comercial", (string)null);
+                });
+
+            modelBuilder.Entity("FleetExecutive.Infrastructure.Persistence.Lookups.StatusComissaoLookup", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("status_comissao", (string)null);
+                });
+
+            modelBuilder.Entity("FleetExecutive.Infrastructure.Persistence.Lookups.StatusFaturaLookup", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("status_fatura", (string)null);
+                });
+
+            modelBuilder.Entity("FleetExecutive.Infrastructure.Persistence.Lookups.StatusFunilLookup", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("status_funil", (string)null);
+                });
+
+            modelBuilder.Entity("FleetExecutive.Infrastructure.Persistence.Lookups.StatusOperacionalLookup", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("status_operacional", (string)null);
+                });
+
+            modelBuilder.Entity("FleetExecutive.Infrastructure.Persistence.Lookups.StatusTarefaLookup", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("status_tarefa", (string)null);
+                });
+
+            modelBuilder.Entity("FleetExecutive.Infrastructure.Persistence.Lookups.StatusVeiculoLookup", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("status_veiculo", (string)null);
+                });
+
+            modelBuilder.Entity("FleetExecutive.Infrastructure.Persistence.Lookups.SubtipoServicoLookup", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("subtipo_servico", (string)null);
+                });
+
+            modelBuilder.Entity("FleetExecutive.Infrastructure.Persistence.Lookups.TipoCobrancaLookup", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("tipo_cobranca", (string)null);
+                });
+
+            modelBuilder.Entity("FleetExecutive.Infrastructure.Persistence.Lookups.TipoComissaoLookup", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("tipo_comissao", (string)null);
+                });
+
+            modelBuilder.Entity("FleetExecutive.Infrastructure.Persistence.Lookups.TipoDocumentoPrestadorLookup", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("tipo_documento_prestador", (string)null);
+                });
+
+            modelBuilder.Entity("FleetExecutive.Infrastructure.Persistence.Lookups.TipoEnderecoLookup", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("tipo_endereco", (string)null);
+                });
+
+            modelBuilder.Entity("FleetExecutive.Infrastructure.Persistence.Lookups.TipoPessoaLookup", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("tipo_pessoa", (string)null);
+                });
+
+            modelBuilder.Entity("FleetExecutive.Infrastructure.Persistence.Lookups.TipoPrestadorLookup", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("tipo_prestador", (string)null);
+                });
+
+            modelBuilder.Entity("FleetExecutive.Infrastructure.Persistence.Lookups.TipoRecebedorComissaoLookup", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("tipo_recebedor_comissao", (string)null);
+                });
+
+            modelBuilder.Entity("FleetExecutive.Infrastructure.Persistence.Lookups.TipoServicoLookup", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("tipo_servico", (string)null);
+                });
+
+            modelBuilder.Entity("FleetExecutive.Infrastructure.Persistence.Lookups.TipoVeiculoLookup", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("tipo_veiculo", (string)null);
+                });
+
+            modelBuilder.Entity("FleetExecutive.Infrastructure.Persistence.Lookups.VinculoTarefaLookup", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("vinculo_tarefa", (string)null);
+                });
+
+            modelBuilder.Entity("FleetExecutive.Domain.Clientes.Customer", b =>
+                {
+                    b.HasOne("FleetExecutive.Infrastructure.Persistence.Lookups.TipoPessoaLookup", null)
+                        .WithMany()
+                        .HasForeignKey("Tipo")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("FleetExecutive.Domain.Clientes.CustomerAddress", b =>
@@ -1150,6 +1524,78 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                     b.HasOne("FleetExecutive.Domain.Clientes.Customer", null)
                         .WithMany("Enderecos")
                         .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FleetExecutive.Infrastructure.Persistence.Lookups.TipoEnderecoLookup", null)
+                        .WithMany()
+                        .HasForeignKey("Tipo")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("FleetExecutive.Domain.Financeiro.Charge", b =>
+                {
+                    b.HasOne("FleetExecutive.Infrastructure.Persistence.Lookups.OrigemCobrancaLookup", null)
+                        .WithMany()
+                        .HasForeignKey("Origem")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FleetExecutive.Infrastructure.Persistence.Lookups.StatusCobrancaLookup", null)
+                        .WithMany()
+                        .HasForeignKey("Status")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FleetExecutive.Infrastructure.Persistence.Lookups.TipoCobrancaLookup", null)
+                        .WithMany()
+                        .HasForeignKey("Tipo")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("FleetExecutive.Domain.Financeiro.Commission", b =>
+                {
+                    b.HasOne("FleetExecutive.Infrastructure.Persistence.Lookups.TipoRecebedorComissaoLookup", null)
+                        .WithMany()
+                        .HasForeignKey("RecebedorTipo")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FleetExecutive.Infrastructure.Persistence.Lookups.StatusComissaoLookup", null)
+                        .WithMany()
+                        .HasForeignKey("Status")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FleetExecutive.Infrastructure.Persistence.Lookups.TipoComissaoLookup", null)
+                        .WithMany()
+                        .HasForeignKey("Tipo")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("FleetExecutive.Domain.Financeiro.Invoice", b =>
+                {
+                    b.HasOne("FleetExecutive.Infrastructure.Persistence.Lookups.StatusFaturaLookup", null)
+                        .WithMany()
+                        .HasForeignKey("Status")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("FleetExecutive.Domain.Orcamentos.Quote", b =>
+                {
+                    b.HasOne("FleetExecutive.Infrastructure.Persistence.Lookups.OrigemOrcamentoLookup", null)
+                        .WithMany()
+                        .HasForeignKey("Origem")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FleetExecutive.Infrastructure.Persistence.Lookups.StatusFunilLookup", null)
+                        .WithMany()
+                        .HasForeignKey("Status")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -1161,6 +1607,43 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                         .HasForeignKey("QuoteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("FleetExecutive.Infrastructure.Persistence.Lookups.SubtipoServicoLookup", null)
+                        .WithMany()
+                        .HasForeignKey("Subtipo")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FleetExecutive.Infrastructure.Persistence.Lookups.TipoServicoLookup", null)
+                        .WithMany()
+                        .HasForeignKey("TipoServico")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FleetExecutive.Infrastructure.Persistence.Lookups.TipoVeiculoLookup", null)
+                        .WithMany()
+                        .HasForeignKey("TipoVeiculoPreferido");
+                });
+
+            modelBuilder.Entity("FleetExecutive.Domain.Pedidos.Order", b =>
+                {
+                    b.HasOne("FleetExecutive.Infrastructure.Persistence.Lookups.OrigemOrcamentoLookup", null)
+                        .WithMany()
+                        .HasForeignKey("Origem")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FleetExecutive.Infrastructure.Persistence.Lookups.StatusComercialLookup", null)
+                        .WithMany()
+                        .HasForeignKey("StatusComercial")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FleetExecutive.Infrastructure.Persistence.Lookups.StatusOperacionalLookup", null)
+                        .WithMany()
+                        .HasForeignKey("StatusOperacional")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("FleetExecutive.Domain.Pedidos.OrderItem", b =>
@@ -1168,6 +1651,21 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                     b.HasOne("FleetExecutive.Domain.Pedidos.Order", null)
                         .WithMany("Itens")
                         .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FleetExecutive.Infrastructure.Persistence.Lookups.SubtipoServicoLookup", null)
+                        .WithMany()
+                        .HasForeignKey("Tipo")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("FleetExecutive.Domain.Prestadores.Driver", b =>
+                {
+                    b.HasOne("FleetExecutive.Infrastructure.Persistence.Lookups.TipoPrestadorLookup", null)
+                        .WithMany()
+                        .HasForeignKey("Tipo")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -1179,6 +1677,12 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                         .HasForeignKey("DriverId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("FleetExecutive.Infrastructure.Persistence.Lookups.TipoDocumentoPrestadorLookup", null)
+                        .WithMany()
+                        .HasForeignKey("Tipo")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("FleetExecutive.Domain.Prestadores.DriverLanguage", b =>
@@ -1186,6 +1690,55 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                     b.HasOne("FleetExecutive.Domain.Prestadores.Driver", null)
                         .WithMany("Idiomas")
                         .HasForeignKey("DriverId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FleetExecutive.Infrastructure.Persistence.Lookups.NivelIdiomaLookup", null)
+                        .WithMany()
+                        .HasForeignKey("Nivel")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("FleetExecutive.Domain.Tarefas.TaskItem", b =>
+                {
+                    b.HasOne("FleetExecutive.Infrastructure.Persistence.Lookups.PrioridadeTarefaLookup", null)
+                        .WithMany()
+                        .HasForeignKey("Prioridade")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FleetExecutive.Infrastructure.Persistence.Lookups.StatusTarefaLookup", null)
+                        .WithMany()
+                        .HasForeignKey("Status")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FleetExecutive.Infrastructure.Persistence.Lookups.VinculoTarefaLookup", null)
+                        .WithMany()
+                        .HasForeignKey("VinculoTipo");
+                });
+
+            modelBuilder.Entity("FleetExecutive.Domain.Usuarios.User", b =>
+                {
+                    b.HasOne("FleetExecutive.Infrastructure.Persistence.Lookups.PerfilLookup", null)
+                        .WithMany()
+                        .HasForeignKey("Perfil")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("FleetExecutive.Domain.Veiculos.Fleet", b =>
+                {
+                    b.HasOne("FleetExecutive.Infrastructure.Persistence.Lookups.CategoriaVeiculoLookup", null)
+                        .WithMany()
+                        .HasForeignKey("Categoria")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FleetExecutive.Infrastructure.Persistence.Lookups.TipoVeiculoLookup", null)
+                        .WithMany()
+                        .HasForeignKey("Tipo")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -1202,6 +1755,12 @@ namespace FleetExecutive.Infrastructure.Persistence.Migrations.Tenant
                         .WithMany()
                         .HasForeignKey("MotoristaHabitualId")
                         .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("FleetExecutive.Infrastructure.Persistence.Lookups.StatusVeiculoLookup", null)
+                        .WithMany()
+                        .HasForeignKey("Status")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("FleetExecutive.Domain.Clientes.Customer", b =>

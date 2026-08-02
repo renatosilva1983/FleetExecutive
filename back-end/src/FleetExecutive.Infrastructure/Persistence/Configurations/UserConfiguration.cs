@@ -14,6 +14,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.Email).HasMaxLength(320).IsRequired();
         builder.HasIndex(u => u.Email).IsUnique();
         builder.Property(u => u.SenhaHash).IsRequired();
-        builder.Property(u => u.Perfil).HasConversion<string>().HasMaxLength(30);
+        // Perfil: enum virou FK para tabela-catálogo (ver EnumLookupRegistry).
     }
 }

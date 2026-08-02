@@ -15,7 +15,7 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
         builder.Property(c => c.Nome).HasMaxLength(200).IsRequired();
         builder.Property(c => c.Email).HasMaxLength(320).IsRequired();
         builder.Property(c => c.CpfCnpj).HasMaxLength(20);
-        builder.Property(c => c.Tipo).HasConversion<string>().HasMaxLength(20);
+        // Tipo: enum virou FK para tabela-catálogo (ver EnumLookupRegistry).
         builder.HasIndex(c => c.Email);
         builder.HasIndex(c => c.CpfCnpj);
         builder.HasIndex(c => c.Nome);

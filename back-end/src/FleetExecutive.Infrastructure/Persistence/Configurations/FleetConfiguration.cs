@@ -11,7 +11,6 @@ public class FleetConfiguration : IEntityTypeConfiguration<Fleet>
         builder.ToTable("fleets");
         builder.HasKey(f => f.Id);
         builder.Property(f => f.Titulo).HasMaxLength(200).IsRequired();
-        builder.Property(f => f.Tipo).HasConversion<string>().HasMaxLength(20);
-        builder.Property(f => f.Categoria).HasConversion<string>().HasMaxLength(20);
+        // Tipo / Categoria: enums viraram FK para tabela-catálogo (ver EnumLookupRegistry).
     }
 }

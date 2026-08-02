@@ -7,6 +7,7 @@ using FleetExecutive.Domain.Prestadores;
 using FleetExecutive.Domain.Tarefas;
 using FleetExecutive.Domain.Usuarios;
 using FleetExecutive.Domain.Veiculos;
+using FleetExecutive.Infrastructure.Persistence.Lookups;
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -51,5 +52,28 @@ public class FleetExecutiveDbContext : MultiTenantDbContext, IApplicationDbConte
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(FleetExecutiveDbContext).Assembly);
+
+        // Tabelas-catálogo (enum -> tabela) e suas FKs, configuradas de forma centralizada a partir
+        // do EnumLookupRegistry (em vez de repetir em cada Configuration). Cada catálogo tem a chave
+        // "Id" = valor do enum (não gerada pelo banco) e "Nome" = identificador do enum.
+        foreach (var t in EnumLookupRegistry.Tables)
+        {
+            var eb = modelBuilder.Entity(t.ClrType);
+            eb.ToTable(t.TableName);
+            eb.HasKey("Id");
+            eb.Property("Id").ValueGeneratedNever();
+            eb.Property("Nome").HasMaxLength(80).IsRequired();
+        }
+
+        // Cada propriedade enum de negócio vira uma FK (sem propriedade de navegação) para o "Id"
+        // da tabela-catálogo correspondente. Como a propriedade e o "Id" são o MESMO enum, ambos
+        // viram coluna int e o Postgres passa a garantir integridade referencial.
+        foreach (var (entity, lookup, property) in EnumLookupRegistry.ForeignKeys)
+        {
+            modelBuilder.Entity(entity)
+                .HasOne(lookup)
+                .WithMany()
+                .HasForeignKey(property);
+        }
     }
 }

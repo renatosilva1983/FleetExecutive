@@ -12,11 +12,10 @@ public class QuoteServiceConfiguration : IEntityTypeConfiguration<QuoteService>
     {
         builder.ToTable("quote_services");
         builder.HasKey(s => s.Id);
-        builder.Property(s => s.TipoServico).HasConversion<string>().HasMaxLength(30);
-        builder.Property(s => s.Subtipo).HasConversion<string>().HasMaxLength(30);
+        // TipoServico / Subtipo: enums viraram FK para tabela-catálogo (ver EnumLookupRegistry).
         builder.Property(s => s.Origem).HasMaxLength(200).IsRequired();
         builder.Property(s => s.Destino).HasMaxLength(200).IsRequired();
-        builder.Property(s => s.TipoVeiculoPreferido).HasConversion<string>().HasMaxLength(20);
+        // TipoVeiculoPreferido (nullable): enum virou FK opcional para tabela-catálogo (ver EnumLookupRegistry).
 
         builder.Property<List<CaracteristicaServico>>("_caracteristicas")
             .HasColumnName("caracteristicas")

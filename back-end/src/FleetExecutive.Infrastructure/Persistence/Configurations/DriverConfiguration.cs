@@ -13,7 +13,7 @@ public class DriverConfiguration : IEntityTypeConfiguration<Driver>
         builder.ToTable("drivers");
         builder.HasKey(d => d.Id);
         builder.Property(d => d.Nome).HasMaxLength(200).IsRequired();
-        builder.Property(d => d.Tipo).HasConversion<string>().HasMaxLength(30);
+        // Tipo: enum virou FK para tabela-catálogo (ver EnumLookupRegistry).
         builder.Property(d => d.ComissaoPercentual).HasColumnType("numeric(5,2)");
         builder.HasIndex(d => d.Nome);
         builder.HasIndex(d => d.Referencia);

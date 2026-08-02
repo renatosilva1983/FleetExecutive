@@ -10,8 +10,7 @@ public class QuoteConfiguration : IEntityTypeConfiguration<Quote>
     {
         builder.ToTable("quotes");
         builder.HasKey(q => q.Id);
-        builder.Property(q => q.Origem).HasConversion<string>().HasMaxLength(20);
-        builder.Property(q => q.Status).HasConversion<string>().HasMaxLength(30);
+        // Origem / Status: enums viraram FK para tabela-catálogo (ver EnumLookupRegistry).
         builder.Property(q => q.ValorEstimado).HasColumnType("numeric(12,2)");
         builder.HasIndex(q => q.Status);
         builder.HasIndex(q => q.CustomerId);

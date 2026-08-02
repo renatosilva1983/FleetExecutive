@@ -10,7 +10,7 @@ public class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
     {
         builder.ToTable("invoices");
         builder.HasKey(i => i.Id);
-        builder.Property(i => i.Status).HasConversion<string>().HasMaxLength(20);
+        // Status: enum virou FK para tabela-catálogo (ver EnumLookupRegistry).
         builder.HasIndex(i => i.OrderId).IsUnique();
     }
 }

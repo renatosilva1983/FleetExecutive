@@ -1,0 +1,41 @@
+# =============================================================================
+#  cd-master-prod.yml — CD da master: TESTA (deploy de PRODUÇÃO é PLACEHOLDER).
+# -----------------------------------------------------------------------------
+#  O gatilho já fica ATIVO desde já: a cada push em master, roda build+test. O
+#  passo de deploy para PRODUÇÃO está RESERVADO (placeholder) — o ambiente ainda
+#  não foi contratado. Quando existir, preencha o passo marcado abaixo.
+#
+#  💡 Dica para quando prod for real: considere proteger este deploy com um
+#     GitHub Environment "production" exigindo APROVAÇÃO manual antes de subir —
+#     é o que separa Continuous Delivery (para e espera o ok) de Continuous
+#     Deployment (sobe sozinho).
+# =============================================================================
+name: CD Master - Testes + Deploy Produção (placeholder)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+jobs:
+  # 1) Valida: build + test.
+  build-test:
+    uses: ./.github/workflows/_build-test.yml
+
+  # 2) Deploy produção — hoje só um marcador; roda se os testes passarem.
+  deploy-producao:
+    needs: build-test
+    runs-on: self-hosted
+    # Quando prod for real, descomente para exigir aprovação manual:
+    # environment: production
+    steps:
+      # ┌────────────────────────────────────────────────────────────────────┐
+      # │  PLACEHOLDER — DEPLOY EM PRODUÇÃO                                    │
+      # │  Ambiente ainda não contratado. Hoje este job só confirma que os     │
+      # │  testes passaram. Quando a produção existir, troque o echo abaixo     │
+      # │  pelos passos reais (publicar imagem versionada, aplicar no servidor/ │
+      # │  cluster de prod, rodar smoke tests / health check).                  │
+      # └────────────────────────────────────────────────────────────────────┘
+      - name: (placeholder) Deploy em produção
+        run: echo "TODO deploy PRODUCAO - ambiente ainda nao contratado. Build e testes OK."

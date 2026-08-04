@@ -1,0 +1,58 @@
+# =============================================================================
+#  ci-pr-gate.yml — "PR gate": valida o PR e, se passar, faz o MERGE AUTOMÁTICO.
+# -----------------------------------------------------------------------------
+#  Vale para PRs mirando as branches de promoção: develop, release e master.
+#  Fluxo: build+test (via _build-test) -> se ficar verde, mergeia o PR sozinho.
+#
+#  IMPORTANTE:
+#   - As branches-alvo devem BLOQUEAR push direto e exigir PR (branch protection).
+#   - NÃO marque este workflow como "required status check": ele mesmo faz o
+#     merge, então exigir o próprio check trava tudo (nunca fica verde antes).
+#   - O merge usa o secret PAT_MERGE (um PAT), não o GITHUB_TOKEN. Motivo: um
+#     merge feito pelo GITHUB_TOKEN NÃO dispara outros workflows; com o PAT, o
+#     push do merge conta como ação real e ACIONA o CD da branch de destino
+#     (ex.: cd-develop-local após mergear na develop).
+#
+#   ⚠️ Sobre a MASTER (produção): hoje o deploy de prod é só placeholder, então
+#      auto-mergear na master é inofensivo. Quando o deploy de produção for real,
+#      reconsidere: talvez tirar 'master' daqui e exigir merge manual, ou exigir
+#      aprovação (GitHub Environments) antes de subir pra prod.
+# =============================================================================
+name: CI PR - Build, Test e Auto-merge
+
+on:
+  pull_request:
+    branches:
+      - spr01/api/develop
+      - spr01/api/release
+      - master
+
+# O token precisa de escrita para conseguir mergear o PR.
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  # 1) Reaproveita o tijolo de build+test.
+  build-test:
+    uses: ./.github/workflows/_build-test.yml
+
+  # 2) Só é alcançado se o build-test passar (needs). Aí mergeia o PR.
+  auto-merge:
+    needs: build-test
+    runs-on: self-hosted
+    steps:
+      # Usamos github-script (Octokit embutido) para não depender do gh CLI,
+      # que pode não estar instalado no runner.
+      - name: Merge automático do PR
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.PAT_MERGE }}
+          script: |
+            await github.rest.pulls.merge({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              merge_method: 'merge',   // 'merge' | 'squash' | 'rebase'
+            });
+            core.info('✔ Build e testes OK — PR mergeado automaticamente.');

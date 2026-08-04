@@ -1,0 +1,39 @@
+# =============================================================================
+#  _build-test.yml — TIJOLO reutilizável: restaura, compila e testa a solution.
+# -----------------------------------------------------------------------------
+#  Este workflow NÃO roda sozinho — ele é CHAMADO por outros (via "uses:") para
+#  não repetir os mesmos passos de build+test em cada branch. É o coração do CI.
+#
+#  Quem chama: ci-feature, ci-pr-gate, cd-develop-local, cd-release-homolog e
+#  cd-master-prod. Se um dia mudar o jeito de compilar/testar, muda só AQUI.
+# =============================================================================
+name: _build-test (reutilizável)
+
+on:
+  workflow_call: {}          # só pode ser disparado por outro workflow
+
+jobs:
+  build-test:
+    runs-on: self-hosted
+
+    # Os comandos dotnet rodam a partir de back-end/, onde está a solution.
+    defaults:
+      run:
+        working-directory: back-end
+
+    steps:
+      # 1) Baixar o código para dentro do runner.
+      - name: Baixar o código (checkout)
+        uses: actions/checkout@v4
+
+      # 2) Restaurar dependências.
+      - name: Restore
+        run: dotnet restore FleetExecutive.sln
+
+      # 3) Compilar em Release, sem restaurar de novo.
+      - name: Build
+        run: dotnet build FleetExecutive.sln -c Release --no-restore
+
+      # 4) Rodar toda a suíte de testes (usa o build anterior).
+      - name: Test
+        run: dotnet test FleetExecutive.sln -c Release --no-build --verbosity normal

@@ -1,0 +1,35 @@
+# =============================================================================
+#  cd-release-homolog.yml — CD da release: TESTA (deploy homolog é PLACEHOLDER).
+# -----------------------------------------------------------------------------
+#  O gatilho já fica ATIVO desde já: a cada push em spr01/api/release, roda
+#  build+test. O passo de deploy para HOMOLOGAÇÃO está RESERVADO (placeholder) —
+#  o ambiente ainda não foi contratado. Quando existir, basta preencher o passo
+#  marcado abaixo; o resto do esqueleto já está pronto.
+# =============================================================================
+name: CD Release - Testes + Deploy Homologação (placeholder)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - spr01/api/release
+
+jobs:
+  # 1) Valida: build + test.
+  build-test:
+    uses: ./.github/workflows/_build-test.yml
+
+  # 2) Deploy homologação — hoje só um marcador; roda se os testes passarem.
+  deploy-homologacao:
+    needs: build-test
+    runs-on: self-hosted
+    steps:
+      # ┌────────────────────────────────────────────────────────────────────┐
+      # │  PLACEHOLDER — DEPLOY EM HOMOLOGAÇÃO                                 │
+      # │  Ambiente ainda não contratado. Hoje este job só confirma que os     │
+      # │  testes passaram. Quando a homologação existir, troque o echo abaixo  │
+      # │  pelos passos reais (ex.: publicar a imagem num registry, aplicar no  │
+      # │  servidor/cluster de homolog e rodar smoke tests).                    │
+      # └────────────────────────────────────────────────────────────────────┘
+      - name: (placeholder) Deploy em homologação
+        run: echo "TODO deploy HOMOLOGACAO - ambiente ainda nao contratado. Build e testes OK."

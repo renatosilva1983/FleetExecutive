@@ -1,0 +1,18 @@
+# =============================================================================
+#  ci-feature.yml — CI da branch de feature: APENAS TESTA.
+# -----------------------------------------------------------------------------
+#  A cada push em spr01/api/feature, roda build+test (via _build-test). Não
+#  publica nada — a feature só precisa provar que compila e passa nos testes,
+#  antes de virar um PR para a develop.
+# =============================================================================
+name: CI Feature - Testes
+
+on:
+  push:
+    branches:
+      - spr01/api/feature
+
+jobs:
+  # Reaproveita o tijolo de build+test. Nada de deploy aqui.
+  testes:
+    uses: ./.github/workflows/_build-test.yml

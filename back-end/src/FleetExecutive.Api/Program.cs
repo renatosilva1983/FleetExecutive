@@ -7,14 +7,55 @@ using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
-using Scalar.AspNetCore;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
-builder.Services.AddOpenApi();
 builder.Services.AddHttpContextAccessor();
+
+// Swagger / OpenAPI (Swashbuckle) com suporte ao esquema JWT Bearer, para autorizar as
+// requisições diretamente pela UI (botão "Authorize").
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "FleetExecutive.Api",
+        Version = "v1",
+    });
+
+    // Evita colisão de schemaId entre tipos de mesmo nome curto em controllers diferentes
+    // (ex.: TasksController+UpdateStatusRequest x QuotesController+UpdateStatusRequest).
+    // Usa o nome totalmente qualificado, com tipos aninhados separados por ponto.
+    options.CustomSchemaIds(type => type.FullName!.Replace("+", "."));
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Informe o token JWT. Exemplo: \"eyJhbGciOi...\"",
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer",
+                },
+            },
+            Array.Empty<string>()
+        },
+    });
+});
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
@@ -63,8 +104,11 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
-    app.MapScalarApiReference();
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "FleetExecutive.Api v1");
+    });
 }
 
 // Primeiro middleware do pipeline — precisa capturar exceções de qualquer etapa seguinte.
@@ -85,3 +129,8 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+// Torna a classe Program acessível para o WebApplicationFactory<Program> usado nos testes de
+// integração (FleetExecutive.Api.IntegrationTests). Com top-level statements, o Program gerado é
+// internal — este partial público apenas expõe o ponto de entrada para a hospedagem em memória.
+public partial class Program;

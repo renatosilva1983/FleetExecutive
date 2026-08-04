@@ -1,81 +1,38 @@
 # =============================================================================
-#  docker-compose.yml  —  FleetExecutive.Api + PostgreSQL
+#  docker-compose.yml  —  FleetExecutive.Api (conectando ao banco LOCAL)
 # -----------------------------------------------------------------------------
 #  O Dockerfile ensina a construir UMA imagem. O Docker Compose sobe VÁRIOS
-#  contêineres de uma vez e faz eles conversarem entre si — aqui, a API e o
-#  banco de dados. Em vez de digitar vários "docker run ..." na mão, você
-#  descreve tudo neste arquivo e roda um único comando:
+#  contêineres de uma vez e faz eles conversarem entre si. Aqui, porém, NÃO
+#  subimos um contêiner de banco de dados: a API e o migrator se conectam ao
+#  PostgreSQL que já roda na SUA máquina (o "banco local"), fora do Docker.
 #
-#      docker compose up            # sobe tudo (use --build na 1ª vez ou após mudar código)
+#      docker compose up            # sobe a API (use --build na 1ª vez ou após mudar código)
 #      docker compose up -d --build # sobe em segundo plano (-d = detached) reconstruindo a imagem
 #      docker compose down          # derruba os contêineres
-#      docker compose down -v       # derruba E apaga os dados do banco (o volume)
 #
-#  Conceito-chave: cada "service" abaixo vira um contêiner. O Compose cria
-#  automaticamente uma REDE interna onde os serviços se enxergam pelo NOME.
-#  Por isso a API acessa o banco pelo host "db" (o nome do serviço), e não por
-#  "localhost" — dentro de um contêiner, "localhost" é ele mesmo, não o vizinho.
+#  Como um contêiner alcança o banco que roda no HOST?
+#  ---------------------------------------------------
+#  Dentro de um contêiner, "localhost" é o PRÓPRIO contêiner, não o seu PC.
+#  Para falar com um serviço que roda no host, usa-se o nome especial
+#  "host.docker.internal" (no Docker Desktop). Se a sua connection string usar
+#  "localhost", troque para "host.docker.internal". O "extra_hosts" abaixo
+#  garante que esse nome resolva para o host mesmo no Linux/WSL.
+#
+#  A connection string em si NÃO fica escrita aqui: ela vem da variável de
+#  ambiente "StrCon_UserPost18" definida na SUA máquina. O Compose lê essa
+#  variável do host e injeta nos contêineres via ${StrCon_UserPost18}.
 # =============================================================================
 
 services:
 
   # ===========================================================================
-  #  SERVIÇO 1 — Banco de dados PostgreSQL
-  # ===========================================================================
-  db:
-    # Imagem oficial do Postgres (versão 16, variante "alpine" = enxuta).
-    # Aqui não construímos nada: apenas baixamos uma imagem pronta do registro.
-    image: postgres:16-alpine
-
-    # Nome fixo do contêiner (opcional, só facilita achar em "docker ps").
-    container_name: FleetExecutive-db
-
-    # Variáveis que a imagem do Postgres usa para se autoconfigurar na 1ª subida:
-    # ela cria este usuário, esta senha e este banco automaticamente.
-    # Batem com a connection string que passamos para a API mais abaixo.
-    environment:
-      POSTGRES_USER: Bessa
-      POSTGRES_PASSWORD: Bessa_dev_only
-      POSTGRES_DB: Bessa_master
-
-    # Mapeia porta do HOST -> porta do CONTÊINER  (host:contêiner).
-    # Isso te deixa conectar do seu PC (ex.: DBeaver/pgAdmin) em localhost:5432.
-    # A API NÃO precisa desse mapeamento — ela fala com o banco pela rede interna.
-    ports:
-      - "5432:5432"
-
-    # Volume nomeado: o Postgres guarda os dados em /var/lib/postgresql/data.
-    # Sem isso, ao derrubar o contêiner você perderia TODOS os dados.
-    # O volume "FleetExecutive-db-data" (declarado lá no fim) persiste fora do contêiner.
-    volumes:
-      - FleetExecutive-db-data:/var/lib/postgresql/data
-
-    # Healthcheck: o Compose fica testando se o banco JÁ está pronto para aceitar
-    # conexões. "pg_isready" é um utilitário do próprio Postgres. Isso é usado
-    # abaixo pela API para só iniciar depois que o banco estiver saudável.
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U Bessa -d Bessa_master"]
-      interval: 5s   # testa a cada 5 segundos
-      timeout: 3s    # cada teste pode demorar no máximo 3s
-      retries: 5     # após 5 falhas seguidas, marca como "unhealthy"
-
-  # ===========================================================================
-  #  SERVIÇO 2 — Migrator (aplica as migrations do banco e ENCERRA)
+  #  SERVIÇO 1 — Migrator (aplica as migrations do banco e ENCERRA)
   # ---------------------------------------------------------------------------
-  #  Diferente da API e do banco, este NÃO é um serviço que fica no ar: é uma
-  #  tarefa de "run once". Ele sobe, prepara o schema do banco e sai. A API só
-  #  começa depois que ele termina com sucesso (ver depends_on lá embaixo).
-  #
-  #  OBS.: o FleetExecutive.MigrationRunner ainda é um esqueleto (só imprime "Hello,
-  #  World!" e sai com sucesso). Ou seja, hoje este serviço "passa" sem fazer
-  #  nada de fato no banco. Quando você implementar a aplicação das migrations
-  #  no tool, este mesmo serviço passará a criar/atualizar o schema — sem
-  #  precisar mexer no compose.
+  #  Não é um serviço que fica no ar: é uma tarefa de "run once". Ele sobe,
+  #  prepara o schema do banco LOCAL e sai. A API só começa depois que ele
+  #  termina com sucesso (ver depends_on lá embaixo).
   # ===========================================================================
   migrator:
-    # Construído a partir do Dockerfile específico do migrator. O "context" é a
-    # raiz do backend (precisa enxergar todos os projetos referenciados), e
-    # "dockerfile" aponta para o arquivo com nome diferente do padrão.
     build:
       context: .
       dockerfile: Dockerfile.migrator
@@ -83,30 +40,26 @@ services:
     container_name: FleetExecutive-migrator
 
     environment:
-      # Mesma connection string da API: o migrator precisa falar com o banco
-      # pela rede interna, usando o Host=db (nome do serviço).
-      ConnectionStrings__Master: "Host=db;Port=5432;Database=Bessa_master;Username=Bessa;Password=Bessa_dev_only"
+      # O app lê a connection string diretamente da variável "StrCon_UserPost18"
+      # (ver AddInfrastructure). Repassamos o valor do HOST, MAS forçando o Host
+      # para "host.docker.internal": o valor original usa "Host=localhost", que
+      # dentro do contêiner apontaria para ele mesmo — não para o seu PC. Como
+      # numa connection string do .NET/Npgsql a ÚLTIMA ocorrência de uma chave
+      # vence, ao acrescentar ";Host=host.docker.internal" no fim sobrescrevemos
+      # só o host e mantemos porta/banco/usuário/senha.
+      StrCon_UserPost18: "${StrCon_UserPost18};Host=host.docker.internal"
 
-    # Espera o banco estar saudável antes de tentar migrar.
-    depends_on:
-      db:
-        condition: service_healthy
+    # Permite que "host.docker.internal" resolva para o host também no Linux/WSL.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
     # "no" = se a tarefa falhar, o compose NÃO fica reiniciando em loop.
-    # É o comportamento certo para uma tarefa pontual (o padrão já é "no",
-    # mas deixamos explícito para o conceito ficar claro).
     restart: "no"
 
   # ===========================================================================
-  #  SERVIÇO 3 — A aplicação FleetExecutive.Api
+  #  SERVIÇO 2 — A aplicação FleetExecutive.Api
   # ===========================================================================
   api:
-    # Em vez de "image", usamos "build": o Compose CONSTRÓI a imagem a partir
-    # do nosso Dockerfile.
-    #   context: .        -> a pasta de build é a raiz do backend (onde estão
-    #                        todos os projetos referenciados). É o mesmo motivo
-    #                        pelo qual o Dockerfile fica aqui, e não em src/FleetExecutive.Api.
-    #   dockerfile: Dockerfile -> qual arquivo usar (poderia ter outro nome).
     build:
       context: .
       dockerfile: Dockerfile
@@ -118,15 +71,15 @@ services:
       # (veja o Program.cs). Em produção você usaria "Production".
       ASPNETCORE_ENVIRONMENT: Development
 
-      # ---- Sobrescrita de configuração por variável de ambiente ----
-      # No .NET, seções aninhadas do appsettings.json viram variáveis usando "__"
-      # (dois underscores) como separador. Então:
-      #   ConnectionStrings__Master   ==  { "ConnectionStrings": { "Master": ... } }
-      # Repare no Host=db: é o NOME do serviço do banco, resolvido pela rede interna.
-      ConnectionStrings__Master: "Host=db;Port=5432;Database=Bessa_master;Username=Bessa;Password=Bessa_dev_only"
+      # ---- Connection string do banco ----
+      # O app lê a variável "StrCon_UserPost18" diretamente (ver AddInfrastructure).
+      # Repassamos o valor da máquina com o Host sobrescrito para
+      # "host.docker.internal" (a última chave repetida vence) — assim o contêiner
+      # alcança o Postgres que roda no seu PC em vez de "localhost".
+      StrCon_UserPost18: "${StrCon_UserPost18};Host=host.docker.internal"
 
-      # Mesma ideia para a chave JWT (Jwt:Key -> Jwt__Key). Em produção isto viria
-      # de um cofre de segredos, nunca escrito no arquivo. Aqui é só para estudo.
+      # Chave JWT (Jwt:Key -> Jwt__Key). Em produção isto viria de um cofre de
+      # segredos, nunca escrito no arquivo. Aqui é só para estudo.
       Jwt__Key: "__DEV_ONLY_CHANGE_ME_troque-em-producao-para-um-segredo-forte__"
 
     # Publica a API: acesse em http://localhost:5000
@@ -134,21 +87,11 @@ services:
     ports:
       - "5000:8080"
 
-    # "depends_on" controla a ORDEM de subida. Aqui a API espera DUAS condições:
-    #   - db saudável (healthcheck passou) — Postgres pronto para conexões;
-    #   - migrator concluído com sucesso — schema do banco já preparado.
-    # "service_completed_successfully" significa: o contêiner rodou e saiu com
-    # código 0. Assim a API nunca sobe antes do banco estar migrado.
+    # Permite que "host.docker.internal" resolva para o host também no Linux/WSL.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    # A API só sobe depois que o migrator concluir com sucesso (schema pronto).
     depends_on:
-      db:
-        condition: service_healthy
       migrator:
         condition: service_completed_successfully
-
-# =============================================================================
-#  VOLUMES  —  armazenamento persistente, gerenciado pelo Docker.
-#  Declarar o volume aqui permite reutilizá-lo entre "up" e "down". Ele só é
-#  apagado se você mandar explicitamente com "docker compose down -v".
-# =============================================================================
-volumes:
-  FleetExecutive-db-data:

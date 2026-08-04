@@ -15,8 +15,14 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        var masterConnectionString = configuration.GetConnectionString("Master")
-            ?? throw new InvalidOperationException("ConnectionStrings:Master não configurada.");
+        // A connection string do banco "master" vem PRIORITARIAMENTE da variável de ambiente
+        // "StrCon_UserPost18" (o provedor padrão de configuração do .NET expõe variáveis de
+        // ambiente, então basta ler pela chave). Se ela não existir, cai para
+        // ConnectionStrings:Master do appsettings — útil em testes/ambiente local sem a variável.
+        var masterConnectionString = configuration["StrCon_UserPost18"]
+            ?? configuration.GetConnectionString("Master")
+            ?? throw new InvalidOperationException(
+                "Connection string não configurada: defina a variável de ambiente 'StrCon_UserPost18' ou 'ConnectionStrings:Master'.");
 
         services.AddDbContext<MasterDbContext>(options => options.UseNpgsql(masterConnectionString));
 

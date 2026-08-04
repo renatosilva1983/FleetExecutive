@@ -46,7 +46,7 @@ RUN dotnet publish tools/FleetExecutive.MigrationRunner/FleetExecutive.Migration
 #  O migrator não é um site: não precisa do servidor web ASP.NET, então essa
 #  imagem é ainda mais leve. Use aspnet para APIs; runtime para apps de console.
 # =============================================================================
-FROM mcr.microsoft.com/dotnet/runtime:9.0 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app
 
 COPY --from=build /app/publish .

@@ -13,11 +13,13 @@ public enum StatusDocumento
 /// <summary>
 /// CNH (com categoria A-E) ou ANTT (registro de empresa, sem categoria). Estrutura/11-modulos-cadastro.md
 /// — alertar quando a validade estiver a menos de 60 dias de vencer.
+///
+/// O Status de validade NÃO é calculado aqui: a regra vive na view vw_driver_documents (fonte única,
+/// ver DatabaseViews) e é lida via DriverDocumentView. Assim relatórios (views materializadas) e o
+/// app compartilham a MESMA definição, sem divergir.
 /// </summary>
 public class DriverDocument : Entity
 {
-    private const int DiasParaAlertaVencimento = 60;
-
     public Guid DriverId { get; private set; }
     public TipoDocumentoPrestador Tipo { get; private set; }
     public string? Categoria { get; private set; }
@@ -37,18 +39,5 @@ public class DriverDocument : Entity
             Numero = numero?.Trim(),
             ValidoAte = validoAte,
         };
-    }
-
-    public StatusDocumento Status
-    {
-        get
-        {
-            if (ValidoAte is null) return StatusDocumento.SemValidade;
-
-            var hoje = DateOnly.FromDateTime(DateTime.UtcNow);
-            if (ValidoAte < hoje) return StatusDocumento.Vencido;
-            if (ValidoAte <= hoje.AddDays(DiasParaAlertaVencimento)) return StatusDocumento.VencendoEmBreve;
-            return StatusDocumento.Valido;
-        }
     }
 }

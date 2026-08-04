@@ -6,6 +6,7 @@ using FleetExecutive.Domain.Prestadores;
 using FleetExecutive.Domain.Tarefas;
 using FleetExecutive.Domain.Usuarios;
 using FleetExecutive.Domain.Veiculos;
+using FleetExecutive.Application.Prestadores.ReadModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace FleetExecutive.Application.Common.Interfaces;
@@ -28,6 +29,9 @@ public interface IApplicationDbContext
     DbSet<Driver> Drivers { get; }
     DbSet<DriverLanguage> DriverLanguages { get; }
     DbSet<DriverDocument> DriverDocuments { get; }
+
+    /// <summary>Read model (view) com o Status de validade já calculado no banco — só leitura.</summary>
+    DbSet<DriverDocumentView> DriverDocumentViews { get; }
     DbSet<Quote> Quotes { get; }
     DbSet<QuoteService> QuoteServices { get; }
     DbSet<Order> Orders { get; }

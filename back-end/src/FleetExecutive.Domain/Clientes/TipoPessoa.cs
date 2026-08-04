@@ -1,7 +1,9 @@
+using System.ComponentModel;
+
 namespace FleetExecutive.Domain.Clientes;
 
 public enum TipoPessoa
 {
-    Fisica = 1,
-    Juridica = 2,
+    [Description("Física")]   Fisica = 1,
+    [Description("Jurídica")] Juridica = 2,
 }

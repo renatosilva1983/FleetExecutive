@@ -1,4 +1,5 @@
 using FleetExecutive.Application.Common.Interfaces;
+using FleetExecutive.Application.Prestadores.ReadModels;
 using FleetExecutive.Domain.Clientes;
 using FleetExecutive.Domain.Financeiro;
 using FleetExecutive.Domain.Orcamentos;
@@ -38,6 +39,7 @@ public class FleetExecutiveDbContext : MultiTenantDbContext, IApplicationDbConte
     public DbSet<Driver> Drivers => Set<Driver>();
     public DbSet<DriverLanguage> DriverLanguages => Set<DriverLanguage>();
     public DbSet<DriverDocument> DriverDocuments => Set<DriverDocument>();
+    public DbSet<DriverDocumentView> DriverDocumentViews => Set<DriverDocumentView>();
     public DbSet<Quote> Quotes => Set<Quote>();
     public DbSet<QuoteService> QuoteServices => Set<QuoteService>();
     public DbSet<Order> Orders => Set<Order>();

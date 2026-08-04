@@ -1,11 +1,12 @@
+using System.ComponentModel;
 using FleetExecutive.Domain.Common;
 
 namespace FleetExecutive.Domain.Clientes;
 
 public enum TipoEndereco
 {
-    Cobranca = 1,
-    Servico = 2,
+    [Description("Cobrança")] Cobranca = 1,
+    [Description("Serviço")]  Servico = 2,
 }
 
 /// <summary>Estrutura/06-modelo-de-dados.md — customer_addresses (endereço de cobrança pode divergir do de serviço).</summary>

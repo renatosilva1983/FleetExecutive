@@ -27,7 +27,8 @@ public class GetDriverByIdQueryHandler : IRequestHandler<GetDriverByIdQuery, Dri
             .Select(l => new DriverLanguageDto(l.Id, l.Idioma, l.Nivel.ToString()))
             .ToListAsync(cancellationToken);
 
-        var documentos = await _db.DriverDocuments.AsNoTracking()
+        // Lê da view vw_driver_documents: o Status de validade já vem calculado pelo banco (fonte única).
+        var documentos = await _db.DriverDocumentViews.AsNoTracking()
             .Where(doc => doc.DriverId == request.Id)
             .ToListAsync(cancellationToken);
 
@@ -36,6 +37,6 @@ public class GetDriverByIdQueryHandler : IRequestHandler<GetDriverByIdQuery, Dri
             driver.Capacidades.Select(c => c.ToString()).ToList(),
             idiomas,
             documentos.Select(doc => new DriverDocumentDto(doc.Id, doc.Tipo.ToString(), doc.Categoria, doc.Numero,
-                doc.ValidoAte, doc.Status.ToString())).ToList());
+                doc.ValidoAte, doc.Status)).ToList());
     }
 }

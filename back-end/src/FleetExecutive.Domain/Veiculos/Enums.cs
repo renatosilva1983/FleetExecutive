@@ -1,3 +1,5 @@
+using System.ComponentModel;
+
 namespace FleetExecutive.Domain.Veiculos;
 
 /// <summary>Estrutura/03-sistema-atual-analise.md — tipos reais observados em produção (mais amplos que o protótipo).</summary>
@@ -5,23 +7,23 @@ public enum TipoVeiculo
 {
     Carro = 1,
     Van = 2,
-    MicroOnibus = 3,
-    Onibus = 4,
+    [Description("Micro-ônibus")] MicroOnibus = 3,
+    [Description("Ônibus")]       Onibus = 4,
 }
 
 public enum CategoriaVeiculo
 {
     Executivo = 1,
-    Rodoviario = 2,
-    SemiLeito = 3,
+    [Description("Rodoviário")]  Rodoviario = 2,
+    [Description("Semi-leito")]  SemiLeito = 3,
     Leito = 4,
-    DoubleDeck = 5,
+    [Description("Double Deck")] DoubleDeck = 5,
 }
 
 public enum StatusVeiculo
 {
     Ativo = 1,
-    Manutencao = 2,
+    [Description("Manutenção")] Manutencao = 2,
     Inativo = 3,
 }
 

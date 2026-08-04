@@ -91,6 +91,11 @@ try
 
         db.Database.Migrate();
 
+        // Views de leitura (idempotente, CREATE OR REPLACE): a regra de status de validade vive no
+        // banco (fonte única) — ver DatabaseViews / DriverDocumentView.
+        Console.WriteLine($"[migrator]   (re)criando views de '{alvo.Identifier}'...");
+        DatabaseViews.CreateOrReplace(db);
+
         // Semeia (idempotente) e valida as tabelas-catálogo derivadas dos enums.
         Console.WriteLine($"[migrator]   semeando/validando catálogos de '{alvo.Identifier}'...");
         EnumLookupSeeder.SeedAndValidate(db);

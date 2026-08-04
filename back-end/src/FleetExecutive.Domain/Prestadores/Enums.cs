@@ -1,14 +1,16 @@
+using System.ComponentModel;
+
 namespace FleetExecutive.Domain.Prestadores;
 
 public enum TipoPrestador
 {
-    MotoristaAutonomo = 1,
-    EmpresaFretamento = 2,
+    [Description("Motorista Autônomo")]    MotoristaAutonomo = 1,
+    [Description("Empresa de Fretamento")] EmpresaFretamento = 2,
 }
 
 public enum NivelIdioma
 {
-    Basico = 1,
+    [Description("Básico")] Basico = 1,
     Fluente = 2,
 }
 
@@ -23,6 +25,6 @@ public enum DriverCapability
 /// <summary>CNH cobre categorias A-E; ANTT é um registro de empresa, sem categoria.</summary>
 public enum TipoDocumentoPrestador
 {
-    Cnh = 1,
-    Antt = 2,
+    [Description("CNH")]  Cnh = 1,
+    [Description("ANTT")] Antt = 2,
 }

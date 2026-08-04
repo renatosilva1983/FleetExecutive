@@ -1,11 +1,13 @@
+using System.ComponentModel;
+
 namespace FleetExecutive.Domain.Pedidos;
 
 /// <summary>Status comercial/financeiro do pedido — independente do ciclo operacional (Estrutura/02-dominio-e-glossario.md).</summary>
 public enum StatusComercial
 {
-    AFaturar = 1,
-    Concluido = 2,
-    EmAndamento = 3,
+    [Description("A Faturar")]    AFaturar = 1,
+    [Description("Concluído")]    Concluido = 2,
+    [Description("Em Andamento")] EmAndamento = 3,
     Cancelado = 4,
 }
 
@@ -13,13 +15,13 @@ public enum StatusComercial
 public enum StatusOperacional
 {
     Confirmado = 1,
-    OrcamentoEnviado = 2,
-    AceiteCliente = 3,
-    CheckIn = 4,
-    ACaminho = 5,
-    EmServico = 6,
+    [Description("Orçamento Enviado")] OrcamentoEnviado = 2,
+    [Description("Aceite do Cliente")] AceiteCliente = 3,
+    [Description("Check-in")]          CheckIn = 4,
+    [Description("A Caminho")]         ACaminho = 5,
+    [Description("Em Serviço")]        EmServico = 6,
     Finalizado = 7,
-    Avaliacao = 8,
+    [Description("Avaliação")]         Avaliacao = 8,
 }
 
 /// <summary>Tipos de evento do log de auditoria transversal (Estrutura/06-modelo-de-dados.md — order_audit_log).</summary>

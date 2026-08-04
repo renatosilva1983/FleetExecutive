@@ -13,7 +13,7 @@ public class DriverDocumentConfiguration : IEntityTypeConfiguration<DriverDocume
         // Tipo: enum virou FK para tabela-catálogo (ver EnumLookupRegistry).
         builder.Property(d => d.Categoria).HasMaxLength(10);
         builder.Property(d => d.Numero).HasMaxLength(60);
-        // "Status" é calculado em runtime a partir de ValidoAte (ver DriverDocument.Status) — não é coluna.
-        builder.Ignore(d => d.Status);
+        // O Status de validade não é coluna nem propriedade do agregado: vive na view
+        // vw_driver_documents (fonte única) e é lido via DriverDocumentView. Ver DatabaseViews.
     }
 }

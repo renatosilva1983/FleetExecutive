@@ -1,3 +1,5 @@
+using FleetExecutive.Domain;
+
 namespace FleetExecutive.Infrastructure.Persistence.Lookups;
 
 /// <summary>
@@ -18,10 +20,14 @@ public sealed class EnumLookupDescriptor
     public required Type EnumType { get; init; }
     public required string TableName { get; init; }
 
-    /// <summary>Os pares (Id, Nome) esperados, derivados dos valores do enum.</summary>
+    /// <summary>
+    /// Os pares (Id, Nome) esperados, derivados dos valores do enum. O "Nome" usa o rótulo do
+    /// atributo [Description] quando presente (texto amigável); senão, cai no nome do enum em C#
+    /// (ver <see cref="EnumExtensions.GetDescription"/>).
+    /// </summary>
     public IReadOnlyList<(int Id, string Nome)> Rows() =>
         Enum.GetValues(EnumType).Cast<object>()
-            .Select(v => (Convert.ToInt32(v), v.ToString()!))
+            .Select(v => (Convert.ToInt32(v), ((Enum)v).GetDescription()))
             .ToList();
 
     public static EnumLookupDescriptor Create<TLookup, TEnum>(string tableName)

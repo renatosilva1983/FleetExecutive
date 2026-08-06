@@ -1,0 +1,60 @@
+# =============================================================================
+#  cd-front-release.yml — CD do FRONT: build do Angular + deploy na AWS.
+# -----------------------------------------------------------------------------
+#  Dispara quando algo entra em spr01/front/release. Autentica na AWS via OIDC
+#  (sem chave guardada — assume a role gha-front-deploy por alguns minutos),
+#  publica o build no S3 e invalida o CloudFront. Runner: GitHub-hosted.
+# =============================================================================
+name: CD Front - Deploy AWS (S3 + CloudFront)
+
+on:
+  push:
+    branches: [spr01/front/release]
+
+# OIDC exige id-token: write (para o runner pedir o crachá JWT).
+# contents: read é o mínimo para o checkout do código.
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+  ROLE_ARN: arn:aws:iam::060622564703:role/gha-front-deploy
+  BUCKET: app.renatosilva.dev
+  DIST_ID: E129PBPM6GO4AW
+  TOOL: fleetexecutive # publica em app.renatosilva.dev/fleetexecutive
+
+jobs:
+  deploy-front:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: front-end # monorepo: o Angular vive aqui
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: front-end/package-lock.json
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Build de produção (com base-href da ferramenta)
+        run: npm run build -- --configuration production --base-href "/${{ env.TOOL }}/"
+
+      # ---- A "mágica" do OIDC: troca o crachá do GitHub por credenciais AWS ----
+      - name: Autenticar na AWS via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Publicar no S3 (subpasta da ferramenta)
+        run: aws s3 sync dist/fleetexecutive-frontend/browser "s3://${{ env.BUCKET }}/${{ env.TOOL }}/" --delete
+
+      - name: Invalidar o cache do CloudFront
+        run: aws cloudfront create-invalidation --distribution-id "${{ env.DIST_ID }}" --paths "/${{ env.TOOL }}/*"

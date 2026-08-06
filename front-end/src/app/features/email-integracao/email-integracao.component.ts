@@ -25,7 +25,7 @@ interface EmailRecebido {
 })
 export class EmailIntegracaoComponent {
   protected readonly conectado = signal(true);
-  protected readonly contaEmail = 'comercial@bessatransportes.com.br';
+  protected readonly contaEmail = 'comercial@fleetexecutivetransportes.com.br';
 
   protected readonly emails = signal<EmailRecebido[]>([
     { inicial: 'I', bg: 'linear-gradient(135deg,#1d4ed8,#3b82f6)', de: 'INSPER — insper@email.com.br', assunto: 'Solicitação de orçamento — 45 pessoas — SP × Campos do Jordão — 15/08/2026', tempo: 'há 18 min', naoLido: true, classificacao: 'Novo orçamento' },

@@ -1,6 +1,6 @@
-# Bessa Transportes — Front-end (FleetExecutive)
+# FleetExecutive Transportes — Front-end (FleetExecutive)
 
-Painel de gestão de frota executiva da **Bessa Transportes**, construído em
+Painel de gestão de frota executiva da **FleetExecutive Transportes**, construído em
 **Angular 20** (standalone components + signals) a partir dos protótipos HTML
 (`Proposta 1/Versao3-Com-Melhorias`) e integrado à API .NET **FleetExecutive**
 (`back-end/FleetExecutive.sln`).
@@ -29,7 +29,7 @@ chamadas `/api/*` para a API .NET, evitando CORS em desenvolvimento.
 npm run build
 ```
 
-Artefatos em `dist/bessa-frontend/`. O build de produção troca
+Artefatos em `dist/fleetexecutive-frontend/`. O build de produção troca
 `environment.ts` por `environment.production.ts` (ver `angular.json` →
 `fileReplacements`).
 

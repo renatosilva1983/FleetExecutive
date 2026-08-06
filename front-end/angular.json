@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "bessa-frontend": {
+    "fleetexecutive-frontend": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -70,10 +70,10 @@
           },
           "configurations": {
             "production": {
-              "buildTarget": "bessa-frontend:build:production"
+              "buildTarget": "fleetexecutive-frontend:build:production"
             },
             "development": {
-              "buildTarget": "bessa-frontend:build:development"
+              "buildTarget": "fleetexecutive-frontend:build:development"
             }
           },
           "defaultConfiguration": "development"

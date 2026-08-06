@@ -26,7 +26,7 @@ interface NavGroup {
       <div class="sidebar-logo">
         <div class="logo-mark">B</div>
         <div>
-          <div class="logo-text">BESSA</div>
+          <div class="logo-text">FleetExecutive</div>
           <div class="logo-sub">Orgulho em transportar você!</div>
         </div>
         <div class="collapse-btn">‹</div>

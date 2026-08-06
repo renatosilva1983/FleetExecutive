@@ -19,9 +19,9 @@ export class EmpresaComponent {
   private readonly notify = inject(NotificationService);
 
   protected readonly form = this.fb.nonNullable.group({
-    razaoSocial: ['Bessa Transportes Ltda'],
+    razaoSocial: ['FleetExecutive Transportes Ltda'],
     cnpj: ['12.345.678/0001-90'],
-    email: ['comercial@bessatransportes.com.br'],
+    email: ['comercial@fleetexecutivetransportes.com.br'],
     telefone: ['(11) 4002-8922'],
     margemMinima: [40],
     metaNps: [70],

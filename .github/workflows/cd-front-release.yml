@@ -1,0 +1,50 @@
+name: CD Front - Deploy AWS (S3 + CloudFront)
+
+on:
+  push:
+    branches: [spr01/front/release]
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+  ROLE_ARN: arn:aws:iam::060622564703:role/gha-front-deploy
+  BUCKET: app.renatosilva.dev
+  DIST_ID: E129PBPM6GO4AW
+  TOOL: fleetexecutive
+
+jobs:
+  deploy-front:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: front-end
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: front-end/package-lock.json
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Build de producao
+        run: npm run build -- --configuration production --base-href "/${{ env.TOOL }}/"
+
+      - name: Autenticar na AWS via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Publicar no S3
+        run: aws s3 sync dist/fleetexecutive-frontend/browser "s3://${{ env.BUCKET }}/${{ env.TOOL }}/" --delete
+
+      - name: Invalidar CloudFront
+        run: aws cloudfront create-invalidation --distribution-id "${{ env.DIST_ID }}" --paths "/${{ env.TOOL }}/*"

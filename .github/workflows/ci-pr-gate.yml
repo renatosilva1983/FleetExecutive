@@ -11,7 +11,7 @@
 #   - O merge usa o secret PAT_MERGE (um PAT), não o GITHUB_TOKEN. Motivo: um
 #     merge feito pelo GITHUB_TOKEN NÃO dispara outros workflows; com o PAT, o
 #     push do merge conta como ação real e ACIONA o CD da branch de destino
-#     (ex.: cd-develop-local após mergear na develop).
+#     (ex.: cd-front-release ao mergear na branch de release do front).
 #
 #   ⚠️ Sobre a MASTER (produção): hoje o deploy de prod é só placeholder, então
 #      auto-mergear na master é inofensivo. Quando o deploy de produção for real,
@@ -23,8 +23,9 @@ name: CI PR - Build, Test e Auto-merge
 on:
   pull_request:
     branches:
-      - spr01/api/develop
+      - spr01/develop
       - spr01/api/release
+      - spr01/front/release
       - master
 
 # O token precisa de escrita para conseguir mergear o PR.
@@ -40,7 +41,7 @@ jobs:
   # 2) Só é alcançado se o build-test passar (needs). Aí mergeia o PR.
   auto-merge:
     needs: build-test
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       # Usamos github-script (Octokit embutido) para não depender do gh CLI,
       # que pode não estar instalado no runner.

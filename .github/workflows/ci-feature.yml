@@ -1,16 +1,17 @@
 # =============================================================================
-#  ci-feature.yml — CI da branch de feature: APENAS TESTA.
+#  ci-feature.yml — CI das features da API: APENAS TESTA (build + test).
 # -----------------------------------------------------------------------------
-#  A cada push em spr01/api/feature, roda build+test (via _build-test). Não
-#  publica nada — a feature só precisa provar que compila e passa nos testes,
-#  antes de virar um PR para a develop.
+#  A cada push numa branch de feature da API, roda build+test (via _build-test,
+#  agora GitHub-hosted). Não publica nada — a feature só precisa provar que
+#  compila e passa nos testes antes de virar PR para a develop.
 # =============================================================================
 name: CI Feature - Testes
 
 on:
   push:
     branches:
-      - spr01/api/feature
+      - spr01/api/feature # branch que recebe PRs das features
+      - spr01/api/feature/** # branches de atividade (spr01/api/feature/xyz)
 
 jobs:
   # Reaproveita o tijolo de build+test. Nada de deploy aqui.

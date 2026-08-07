@@ -1,39 +1,75 @@
 # =============================================================================
-#  _build-test.yml — TIJOLO reutilizável: restaura, compila e testa a solution.
+#  _build-test.yml — TIJOLO reutilizável: restaura, compila, migra e testa.
 # -----------------------------------------------------------------------------
-#  Este workflow NÃO roda sozinho — ele é CHAMADO por outros (via "uses:") para
-#  não repetir os mesmos passos de build+test em cada branch. É o coração do CI.
+#  NÃO roda sozinho — é CHAMADO por outros (via "uses:"). Runner GitHub-hosted.
 #
-#  Quem chama: ci-feature, ci-pr-gate, cd-develop-local, cd-release-homolog e
-#  cd-master-prod. Se um dia mudar o jeito de compilar/testar, muda só AQUI.
+#  Como os testes de integração usam um Postgres REAL (ApiTestFactory lê a
+#  connection string de StrCon_UserPost18), subimos um Postgres de SERVIÇO
+#  (service container), recriamos os roles/banco (bootstrap) e rodamos as
+#  migrations (schema + catálogos) ANTES de "dotnet test".
 # =============================================================================
 name: _build-test (reutilizável)
 
 on:
-  workflow_call: {}          # só pode ser disparado por outro workflow
+  workflow_call: {}
 
 jobs:
   build-test:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
-    # Os comandos dotnet rodam a partir de back-end/, onde está a solution.
+    # Postgres efêmero para os testes de integração.
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 15
+
+    env:
+      # A mesma variável que o app/migrator/testes usam. Aponta para o service.
+      StrCon_UserPost18: "Host=localhost;Port=5432;Database=fleetexecutive_master;Username=fleetexecutive;Password=fleetexecutive_dev_only;options='-c role=app_owner'"
+      PGPASSWORD: postgres
+
     defaults:
       run:
-        working-directory: back-end
+        working-directory: back-end # onde está a solution
 
     steps:
-      # 1) Baixar o código para dentro do runner.
       - name: Baixar o código (checkout)
         uses: actions/checkout@v4
 
-      # 2) Restaurar dependências.
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      # Recria os roles/usuário/banco que a connection string espera.
+      # (o cliente psql já vem instalado no runner ubuntu-latest)
+      - name: Bootstrap do banco (roles + database)
+        run: |
+          psql -h localhost -U postgres -v ON_ERROR_STOP=1 <<'SQL'
+          CREATE ROLE app_owner NOLOGIN;
+          GRANT app_owner TO postgres;
+          CREATE ROLE fleetexecutive LOGIN PASSWORD 'fleetexecutive_dev_only' IN ROLE app_owner;
+          CREATE DATABASE fleetexecutive_master OWNER app_owner;
+          SQL
+
       - name: Restore
         run: dotnet restore FleetExecutive.sln
 
-      # 3) Compilar em Release, sem restaurar de novo.
       - name: Build
         run: dotnet build FleetExecutive.sln -c Release --no-restore
 
-      # 4) Rodar toda a suíte de testes (usa o build anterior).
+      # Cria o schema (master + tenant em banco único de dev) e semeia os catálogos.
+      - name: Migrations (schema + catálogos)
+        run: dotnet run -c Release --no-build --project tools/FleetExecutive.MigrationRunner/FleetExecutive.MigrationRunner.csproj
+
       - name: Test
         run: dotnet test FleetExecutive.sln -c Release --no-build --verbosity normal

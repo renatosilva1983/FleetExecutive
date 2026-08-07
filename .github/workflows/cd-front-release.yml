@@ -46,12 +46,6 @@ jobs:
       - name: Build de produção (com base-href da ferramenta)
         run: npm run build -- --configuration production --base-href "/${{ env.TOOL }}/"
 
-      # ---- DEBUG temporário: imprime só as claims sub/aud do token OIDC ----
-      - name: Debug OIDC claims
-        run: |
-          TOKEN=$(curl -s -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com" | python3 -c "import sys,json;print(json.load(sys.stdin)['value'])")
-          python3 -c "import sys,base64,json; p=sys.argv[1].split('.')[1]; p+='='*(-len(p)%4); c=json.loads(base64.urlsafe_b64decode(p)); print('OIDC_SUB=['+c['sub']+']'); print('OIDC_AUD=['+str(c['aud'])+']')" "$TOKEN"
-
       # ---- A "mágica" do OIDC: troca o crachá do GitHub por credenciais AWS ----
       - name: Autenticar na AWS via OIDC
         uses: aws-actions/configure-aws-credentials@v4

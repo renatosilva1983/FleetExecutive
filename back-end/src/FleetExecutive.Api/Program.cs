@@ -15,6 +15,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
 
+// Health check para o load balancer (ALB) / painel de saúde. Endpoint leve que
+// só prova que o processo está de pé e respondendo — sem depender de tenant/auth.
+builder.Services.AddHealthChecks();
+
 // Swagger / OpenAPI (Swashbuckle) com suporte ao esquema JWT Bearer, para autorizar as
 // requisições diretamente pela UI (botão "Authorize").
 builder.Services.AddEndpointsApiExplorer();
@@ -113,6 +117,10 @@ if (app.Environment.IsDevelopment())
 
 // Primeiro middleware do pipeline — precisa capturar exceções de qualquer etapa seguinte.
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+// /health TERMINAL, antes do multi-tenant/auth: responde 200 "Healthy" para o ALB
+// sem passar pela resolução de tenant (que recusaria um host sem tenant, como o do ALB).
+app.UseHealthChecks("/health");
 
 app.UseHttpsRedirection();
 

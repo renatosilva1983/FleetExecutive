@@ -1,0 +1,152 @@
+# =============================================================================
+#  cd-api-release.yml — CD da API: build -> ECR -> ECS Fargate (migrator + API).
+# -----------------------------------------------------------------------------
+#  Dispara em push a spr01/api/release. Autentica via OIDC (role gha-api-deploy),
+#  builda as imagens da API e do migrator, publica no ECR, registra uma task
+#  definition com DOIS containers (migrator roda 1x -> API sobe depois, via
+#  dependsOn: SUCCESS) e cria/atualiza o service Fargate atrás do ALB.
+# =============================================================================
+name: CD API - Deploy AWS (ECS Fargate)
+
+on:
+  push:
+    branches: [spr01/api/release]
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+  ROLE_ARN: arn:aws:iam::060622564703:role/gha-api-deploy
+  ECR: 060622564703.dkr.ecr.us-east-1.amazonaws.com/fleetexecutive-api
+  CLUSTER: fleetexecutive
+  SERVICE: fleetexecutive-api
+  TG_ARN: arn:aws:elasticloadbalancing:us-east-1:060622564703:targetgroup/fleetexecutive-api-tg/765b25813eb26371
+  EXEC_ROLE: arn:aws:iam::060622564703:role/fleetexecutive-api-ecs-execution
+  TASK_ROLE: arn:aws:iam::060622564703:role/fleetexecutive-api-ecs-task
+  LOG_GROUP: /ecs/fleetexecutive-api
+  SUBNETS: subnet-055b4c05e3dade114,subnet-078a50ae29930af86
+  TASK_SG: sg-0916caa1d5168be30
+  SSM_CONN_ARN: arn:aws:ssm:us-east-1:060622564703:parameter/fleetexecutive/db/app-connection-string
+  API_URL: https://api.renatosilva.dev
+
+jobs:
+  deploy-api:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: back-end # onde estão a solution e os Dockerfiles
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Autenticar na AWS via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login no ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build & push (API + migrator)
+        run: |
+          set -e
+          TAG=${GITHUB_SHA::12}
+          docker build -t "$ECR:api-$TAG"      -t "$ECR:api-latest"      -f Dockerfile .
+          docker build -t "$ECR:migrator-$TAG" -t "$ECR:migrator-latest" -f Dockerfile.migrator .
+          docker push "$ECR:api-$TAG";      docker push "$ECR:api-latest"
+          docker push "$ECR:migrator-$TAG"; docker push "$ECR:migrator-latest"
+          echo "IMG_TAG=$TAG" >> "$GITHUB_ENV"
+
+      - name: Registrar task definition e deployar
+        run: |
+          set -e
+          cat > taskdef.json <<JSON
+          {
+            "family": "fleetexecutive-api",
+            "networkMode": "awsvpc",
+            "requiresCompatibilities": ["FARGATE"],
+            "cpu": "256",
+            "memory": "512",
+            "executionRoleArn": "$EXEC_ROLE",
+            "taskRoleArn": "$TASK_ROLE",
+            "containerDefinitions": [
+              {
+                "name": "migrator",
+                "image": "$ECR:migrator-$IMG_TAG",
+                "essential": false,
+                "environment": [
+                  { "name": "DOTNET_RUNNING_IN_CONTAINER", "value": "false" }
+                ],
+                "secrets": [
+                  { "name": "StrCon_UserPost18", "valueFrom": "$SSM_CONN_ARN" }
+                ],
+                "logConfiguration": {
+                  "logDriver": "awslogs",
+                  "options": {
+                    "awslogs-group": "$LOG_GROUP",
+                    "awslogs-region": "$AWS_REGION",
+                    "awslogs-stream-prefix": "migrator"
+                  }
+                }
+              },
+              {
+                "name": "api",
+                "image": "$ECR:api-$IMG_TAG",
+                "essential": true,
+                "portMappings": [ { "containerPort": 8080, "protocol": "tcp" } ],
+                "dependsOn": [ { "containerName": "migrator", "condition": "SUCCESS" } ],
+                "environment": [
+                  { "name": "DOTNET_RUNNING_IN_CONTAINER", "value": "false" },
+                  { "name": "ASPNETCORE_HTTP_PORTS", "value": "8080" },
+                  { "name": "ASPNETCORE_ENVIRONMENT", "value": "Production" }
+                ],
+                "secrets": [
+                  { "name": "StrCon_UserPost18", "valueFrom": "$SSM_CONN_ARN" }
+                ],
+                "logConfiguration": {
+                  "logDriver": "awslogs",
+                  "options": {
+                    "awslogs-group": "$LOG_GROUP",
+                    "awslogs-region": "$AWS_REGION",
+                    "awslogs-stream-prefix": "api"
+                  }
+                }
+              }
+            ]
+          }
+          JSON
+
+          TD_ARN=$(aws ecs register-task-definition --cli-input-json file://taskdef.json \
+            --query 'taskDefinition.taskDefinitionArn' --output text)
+          echo "Task definition: $TD_ARN"
+
+          if aws ecs describe-services --cluster "$CLUSTER" --services "$SERVICE" \
+               --query 'services[0].status' --output text 2>/dev/null | grep -q ACTIVE; then
+            echo "Service existe -> update (force new deployment)"
+            aws ecs update-service --cluster "$CLUSTER" --service "$SERVICE" \
+              --task-definition "$TD_ARN" --force-new-deployment >/dev/null
+          else
+            echo "Service não existe -> create"
+            aws ecs create-service --cluster "$CLUSTER" --service-name "$SERVICE" \
+              --task-definition "$TD_ARN" --desired-count 1 --launch-type FARGATE \
+              --health-check-grace-period-seconds 120 \
+              --network-configuration "awsvpcConfiguration={subnets=[$SUBNETS],securityGroups=[$TASK_SG],assignPublicIp=ENABLED}" \
+              --load-balancers "targetGroupArn=$TG_ARN,containerName=api,containerPort=8080" >/dev/null
+          fi
+
+          echo "Aguardando o service estabilizar..."
+          aws ecs wait services-stable --cluster "$CLUSTER" --services "$SERVICE"
+          echo "Service estável."
+
+      - name: Verificar /health
+        run: |
+          for i in $(seq 1 10); do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "$API_URL/health" || true)
+            echo "tentativa $i: HTTP $code"
+            if [ "$code" = "200" ]; then echo "API saudável em $API_URL/health"; exit 0; fi
+            sleep 10
+          done
+          echo "API não respondeu 200 em /health"; exit 1

@@ -1,0 +1,37 @@
+# =============================================================================
+#  _build-test-front.yml — TIJOLO reutilizável (Front Angular): instala e builda.
+# -----------------------------------------------------------------------------
+#  NÃO roda sozinho — é CHAMADO por outros (via "uses:"). Runner GitHub-hosted.
+#  Valida que o Angular COMPILA (ng build). O passo de testes (ng test) fica
+#  pronto/comentado até existirem arquivos .spec.ts no projeto.
+# =============================================================================
+name: _build-test-front (reutilizável)
+
+on:
+  workflow_call: {}
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: front-end # onde vive o Angular
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: front-end/package-lock.json
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Build de produção
+        run: npm run build -- --configuration production
+      # Testes unitários do Angular — habilitar quando houver .spec.ts:
+      # - name: Testes (headless)
+      #   run: npm test -- --watch=false --browsers=ChromeHeadless

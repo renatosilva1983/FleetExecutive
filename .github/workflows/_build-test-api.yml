@@ -1,5 +1,5 @@
 # =============================================================================
-#  _build-test.yml — TIJOLO reutilizável: restaura, compila, migra e testa.
+#  _build-test-api.yml — TIJOLO reutilizável (API .NET): restaura, compila, migra e testa.
 # -----------------------------------------------------------------------------
 #  NÃO roda sozinho — é CHAMADO por outros (via "uses:"). Runner GitHub-hosted.
 #
@@ -8,7 +8,7 @@
 #  (service container), recriamos os roles/banco (bootstrap) e rodamos as
 #  migrations (schema + catálogos) ANTES de "dotnet test".
 # =============================================================================
-name: _build-test (reutilizável)
+name: _build-test-api (reutilizável)
 
 on:
   workflow_call: {}

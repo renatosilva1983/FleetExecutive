@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/1.0.6311650">
+  <PropertyGroup>
+    <StartupCommand>npm start</StartupCommand>
+    <JavaScriptTestRoot>src\</JavaScriptTestRoot>
+    <JavaScriptTestFramework>Jasmine</JavaScriptTestFramework>
+    <!-- O build/publish é feito pelo Angular CLI (npm run build), não pelo MSBuild. -->
+    <ShouldRunBuildScript>false</ShouldRunBuildScript>
+    <BuildCommand>npm run build</BuildCommand>
+    <ProductionBuildCommand>npm run build -- --configuration production</ProductionBuildCommand>
+  </PropertyGroup>
+</Project>

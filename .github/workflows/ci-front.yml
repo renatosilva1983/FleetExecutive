@@ -9,7 +9,7 @@ name: CI Front - Build
 on:
   push:
     branches:
-      - spr01/front/feature # branch que recebe PRs das features do Front
+      - spr01/front/features # coletora que recebe PRs das features do Front
       - spr01/front/feature/** # branches de atividade (spr01/front/feature/xyz)
 
 jobs:

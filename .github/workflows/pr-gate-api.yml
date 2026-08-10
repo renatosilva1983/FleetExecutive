@@ -23,6 +23,7 @@ name: PR Gate API - Build, Test e Auto-merge
 on:
   pull_request:
     branches:
+      - spr01/api/features
       - spr01/develop
       - spr01/api/release
       - master

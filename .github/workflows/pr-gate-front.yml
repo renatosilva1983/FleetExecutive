@@ -11,6 +11,7 @@ name: PR Gate Front - Build e Auto-merge
 on:
   pull_request:
     branches:
+      - spr01/front/features
       - spr01/develop
       - spr01/front/release
       - master

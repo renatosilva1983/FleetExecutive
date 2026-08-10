@@ -10,7 +10,7 @@ name: CI API - Testes
 on:
   push:
     branches:
-      - spr01/api/feature # branch que recebe PRs das features da API
+      - spr01/api/features # coletora que recebe PRs das features da API
       - spr01/api/feature/** # branches de atividade (spr01/api/feature/xyz)
 
 jobs:

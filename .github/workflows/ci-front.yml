@@ -1,0 +1,17 @@
+# =============================================================================
+#  ci-front.yml — CI das features do Front (Angular): APENAS VALIDA (build).
+# -----------------------------------------------------------------------------
+#  A cada push numa branch de feature do Front, roda o build (via
+#  _build-test-front). Não publica nada — só prova que o Angular compila.
+# =============================================================================
+name: CI Front - Build
+
+on:
+  push:
+    branches:
+      - spr01/front/feature # branch que recebe PRs das features do Front
+      - spr01/front/feature/** # branches de atividade (spr01/front/feature/xyz)
+
+jobs:
+  build:
+    uses: ./.github/workflows/_build-test-front.yml

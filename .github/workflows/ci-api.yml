@@ -1,0 +1,19 @@
+# =============================================================================
+#  ci-api.yml — CI das features da API (.NET): APENAS TESTA (build + test).
+# -----------------------------------------------------------------------------
+#  A cada push numa branch de feature da API, roda build+test (via
+#  _build-test-api, GitHub-hosted). Não publica nada — a feature só precisa
+#  provar que compila e passa nos testes antes de virar PR para a develop.
+# =============================================================================
+name: CI API - Testes
+
+on:
+  push:
+    branches:
+      - spr01/api/feature # branch que recebe PRs das features da API
+      - spr01/api/feature/** # branches de atividade (spr01/api/feature/xyz)
+
+jobs:
+  # Reaproveita o tijolo de build+test da API. Nada de deploy aqui.
+  testes:
+    uses: ./.github/workflows/_build-test-api.yml

@@ -1,5 +1,5 @@
 # =============================================================================
-#  ci-pr-gate.yml — "PR gate": valida o PR e, se passar, faz o MERGE AUTOMÁTICO.
+#  pr-gate-api.yml — "PR gate" da API: valida o PR e, se passar, faz o MERGE AUTOMÁTICO.
 # -----------------------------------------------------------------------------
 #  Vale para PRs mirando as branches de promoção: develop, release e master.
 #  Fluxo: build+test (via _build-test) -> se ficar verde, mergeia o PR sozinho.
@@ -18,15 +18,16 @@
 #      reconsidere: talvez tirar 'master' daqui e exigir merge manual, ou exigir
 #      aprovação (GitHub Environments) antes de subir pra prod.
 # =============================================================================
-name: CI PR - Build, Test e Auto-merge
+name: PR Gate API - Build, Test e Auto-merge
 
 on:
   pull_request:
     branches:
       - spr01/develop
       - spr01/api/release
-      - spr01/front/release
       - master
+    paths:
+      - "back-end/**" # só valida quando o PR mexe no back-end
 
 # O token precisa de escrita para conseguir mergear o PR.
 permissions:
@@ -36,7 +37,7 @@ permissions:
 jobs:
   # 1) Reaproveita o tijolo de build+test.
   build-test:
-    uses: ./.github/workflows/_build-test.yml
+    uses: ./.github/workflows/_build-test-api.yml
 
   # 2) Só é alcançado se o build-test passar (needs). Aí mergeia o PR.
   auto-merge:
